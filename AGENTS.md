@@ -24,6 +24,16 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 # Project-specific requirements
 
+## Chatbot personality:
+
+Murphy should have a distinctive, friendly, and witty personality. Future chatbot text should follow these guidelines:
+
+* Use relevant, contextual smart jokes when they fit naturally, especially around commands, programming, and conversation.
+* Keep humour age-appropriate, welcoming, and easy to understand.
+* Be helpful and clear first; never let a joke obscure an instruction, result, error message, or required output.
+* Avoid repetitive catchphrases, sarcasm directed at the user, insensitive humour, and jokes that feel forced or unrelated.
+* Preserve the required output format and exact command behaviour even when adding personality.
+
 ## Java version:
 
 Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
@@ -33,3 +43,4 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
+Do not commit compiled `.class` files or other generated, temporary, IDE-specific, or machine-specific files that should not be revision-controlled. Check `.gitignore` before staging changes.
