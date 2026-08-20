@@ -43,8 +43,8 @@ public class Murphy {
                 if (command.trim().equalsIgnoreCase("list")) {
                     System.out.println("     Here are the tasks in your list:");
                     for (int i = 0; i < taskCount; i++) {
-                        System.out.println("     " + (i + 1) + ".[" + tasks[i].getStatusIcon() + "] "
-                                + tasks[i].getDescription());
+                        System.out.println("     " + (i + 1) + ".[" + tasks[i].getType().getSymbol() + "]["
+                                + tasks[i].getStatusIcon() + "] " + tasks[i].getDisplayDescription());
                     }
                 } else if (command.trim().toLowerCase().startsWith("mark ")) {
                     String taskNumber = command.trim().substring("mark ".length()).trim();
@@ -76,16 +76,49 @@ public class Murphy {
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to unmark, like: unmark 2");
                     }
-                } else if (taskCount < MAX_TASKS) {
-                    tasks[taskCount] = new Task(command);
+                } else if (command.trim().toLowerCase().startsWith("todo ") && taskCount < MAX_TASKS) {
+                    String description = command.trim().substring("todo ".length()).trim();
+                    tasks[taskCount] = new Task(Task.Type.TODO, description, null, null);
                     taskCount++;
-                    System.out.println("     added: " + command);
-                } else {
+                    printAddedTask(tasks[taskCount - 1], taskCount);
+                } else if (command.trim().toLowerCase().startsWith("deadline ") && taskCount < MAX_TASKS) {
+                    String input = command.trim().substring("deadline ".length()).trim();
+                    int marker = input.indexOf(" /by ");
+                    if (marker < 0) {
+                        System.out.println("     A deadline needs a date/time, like: deadline submit report /by Friday");
+                    } else {
+                        tasks[taskCount] = new Task(Task.Type.DEADLINE, input.substring(0, marker).trim(),
+                                null, input.substring(marker + 5).trim());
+                        taskCount++;
+                        printAddedTask(tasks[taskCount - 1], taskCount);
+                    }
+                } else if (command.trim().toLowerCase().startsWith("event ") && taskCount < MAX_TASKS) {
+                    String input = command.trim().substring("event ".length()).trim();
+                    int fromMarker = input.indexOf(" /from ");
+                    int toMarker = input.indexOf(" /to ", fromMarker + 7);
+                    if (fromMarker < 0 || toMarker < 0) {
+                        System.out.println("     An event needs a start and end time, like: event meeting /from 2pm /to 4pm");
+                    } else {
+                        tasks[taskCount] = new Task(Task.Type.EVENT, input.substring(0, fromMarker).trim(),
+                                input.substring(fromMarker + 7, toMarker).trim(), input.substring(toMarker + 5).trim());
+                        taskCount++;
+                        printAddedTask(tasks[taskCount - 1], taskCount);
+                    }
+                } else if (taskCount >= MAX_TASKS) {
                     System.out.println("     I can't remember more than " + MAX_TASKS
                             + " tasks. My memory has reached its fixed-size finale.");
+                } else {
+                    System.out.println("     I understand todo, deadline, event, list, mark, and unmark commands.");
                 }
                 System.out.println(separator);
             }
         }
+    }
+
+    /** Prints the confirmation shown after a task is successfully added. */
+    private static void printAddedTask(Task task, int taskCount) {
+        System.out.println("     Got it. I've added this task:");
+        System.out.println("       [" + task.getType().getSymbol() + "][ ] " + task.getDisplayDescription());
+        System.out.println("     Now you have " + taskCount + " tasks in the list.");
     }
 }
