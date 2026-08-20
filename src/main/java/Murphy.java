@@ -25,8 +25,7 @@ public class Murphy {
                 + "What can I do for you? (I promise not to judge your typing.)");
         System.out.println(separator);
 
-        String[] tasks = new String[MAX_TASKS];
-        boolean[] completed = new boolean[MAX_TASKS];
+        Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
 
         try (Scanner scanner = new Scanner(System.in)) {
@@ -44,8 +43,8 @@ public class Murphy {
                 if (command.trim().equalsIgnoreCase("list")) {
                     System.out.println("     Here are the tasks in your list:");
                     for (int i = 0; i < taskCount; i++) {
-                        String status = completed[i] ? "X" : " ";
-                        System.out.println("     " + (i + 1) + ".[" + status + "] " + tasks[i]);
+                        System.out.println("     " + (i + 1) + ".[" + tasks[i].getStatusIcon() + "] "
+                                + tasks[i].getDescription());
                     }
                 } else if (command.trim().toLowerCase().startsWith("mark ")) {
                     String taskNumber = command.trim().substring("mark ".length()).trim();
@@ -55,9 +54,9 @@ public class Murphy {
                             System.out.println("     I couldn't find that task. Please choose a number from 1 to "
                                     + taskCount + ".");
                         } else {
-                            completed[taskIndex] = true;
+                            tasks[taskIndex].markAsDone();
                             System.out.println("     Nice! I've marked this task as done:");
-                            System.out.println("       [X] " + tasks[taskIndex]);
+                            System.out.println("       [X] " + tasks[taskIndex].getDescription());
                         }
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to mark, like: mark 2");
@@ -70,15 +69,15 @@ public class Murphy {
                             System.out.println("     I couldn't find that task. Please choose a number from 1 to "
                                     + taskCount + ".");
                         } else {
-                            completed[taskIndex] = false;
+                            tasks[taskIndex].markAsNotDone();
                             System.out.println("     OK, I've marked this task as not done yet:");
-                            System.out.println("       [ ] " + tasks[taskIndex]);
+                            System.out.println("       [ ] " + tasks[taskIndex].getDescription());
                         }
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to unmark, like: unmark 2");
                     }
                 } else if (taskCount < MAX_TASKS) {
-                    tasks[taskCount] = command;
+                    tasks[taskCount] = new Task(command);
                     taskCount++;
                     System.out.println("     added: " + command);
                 } else {
