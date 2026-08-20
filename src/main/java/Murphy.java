@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -25,8 +27,7 @@ public class Murphy {
                 + "What can I do for you? (I promise not to judge your typing.)");
         System.out.println(separator);
 
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        List<Task> tasks = new ArrayList<>();
 
         try (Scanner scanner = new Scanner(System.in)) {
             while (scanner.hasNextLine()) {
@@ -43,20 +44,36 @@ public class Murphy {
 
                     if (command.trim().equalsIgnoreCase("list")) {
                     System.out.println("     Here are the tasks in your list:");
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println("     " + (i + 1) + "." + tasks[i]);
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println("     " + (i + 1) + "." + tasks.get(i));
+                    }
+                } else if (command.trim().toLowerCase().startsWith("delete ")) {
+                    String taskNumber = command.trim().substring("delete ".length()).trim();
+                    try {
+                        int taskIndex = Integer.parseInt(taskNumber) - 1;
+                        if (taskIndex < 0 || taskIndex >= tasks.size()) {
+                            System.out.println("     I couldn't find that task. Please choose a number from 1 to "
+                                    + tasks.size() + ".");
+                        } else {
+                            Task deletedTask = tasks.remove(taskIndex);
+                            System.out.println("     Noted. I've removed this task:");
+                            System.out.println("       " + deletedTask);
+                            System.out.println("     Now you have " + tasks.size() + " tasks in the list.");
+                        }
+                    } catch (NumberFormatException exception) {
+                        System.out.println("     Please tell me which task number to delete, like: delete 2");
                     }
                 } else if (command.trim().toLowerCase().startsWith("mark ")) {
                     String taskNumber = command.trim().substring("mark ".length()).trim();
                     try {
                         int taskIndex = Integer.parseInt(taskNumber) - 1;
-                        if (taskIndex < 0 || taskIndex >= taskCount) {
+                        if (taskIndex < 0 || taskIndex >= tasks.size()) {
                             System.out.println("     I couldn't find that task. Please choose a number from 1 to "
-                                    + taskCount + ".");
+                                    + tasks.size() + ".");
                         } else {
-                            tasks[taskIndex].markAsDone();
+                            tasks.get(taskIndex).markAsDone();
                             System.out.println("     Nice! I've marked this task as done:");
-                            System.out.println("       [X] " + tasks[taskIndex].getDescription());
+                            System.out.println("       [X] " + tasks.get(taskIndex).getDescription());
                         }
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to mark, like: mark 2");
@@ -65,28 +82,27 @@ public class Murphy {
                     String taskNumber = command.trim().substring("unmark ".length()).trim();
                     try {
                         int taskIndex = Integer.parseInt(taskNumber) - 1;
-                        if (taskIndex < 0 || taskIndex >= taskCount) {
+                        if (taskIndex < 0 || taskIndex >= tasks.size()) {
                             System.out.println("     I couldn't find that task. Please choose a number from 1 to "
-                                    + taskCount + ".");
+                                    + tasks.size() + ".");
                         } else {
-                            tasks[taskIndex].markAsNotDone();
+                            tasks.get(taskIndex).markAsNotDone();
                             System.out.println("     OK, I've marked this task as not done yet:");
-                            System.out.println("       [ ] " + tasks[taskIndex].getDescription());
+                            System.out.println("       [ ] " + tasks.get(taskIndex).getDescription());
                         }
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to unmark, like: unmark 2");
                     }
-                } else if (command.trim().toLowerCase().startsWith("todo") && taskCount < MAX_TASKS) {
+                } else if (command.trim().toLowerCase().startsWith("todo") && tasks.size() < MAX_TASKS) {
                     String trimmedCommand = command.trim();
                     String description = trimmedCommand.length() > "todo".length()
                             ? trimmedCommand.substring("todo".length()).trim() : "";
                     if (description.isEmpty()) {
                         throw new MurphyException("A todo needs a description. Try: todo buy groceries");
                     }
-                    tasks[taskCount] = new Todo(description);
-                    taskCount++;
-                    printAddedTask(tasks[taskCount - 1], taskCount);
-                } else if (command.trim().toLowerCase().startsWith("deadline ") && taskCount < MAX_TASKS) {
+                    tasks.add(new Todo(description));
+                    printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
+                } else if (command.trim().toLowerCase().startsWith("deadline ") && tasks.size() < MAX_TASKS) {
                     String input = command.trim().substring("deadline ".length()).trim();
                     int marker = input.indexOf(" /by ");
                     if (marker < 0 || input.substring(0, marker).trim().isEmpty()
@@ -94,11 +110,10 @@ public class Murphy {
                         throw new MurphyException("A deadline needs a description and a date/time, like: "
                                 + "deadline submit report /by Friday");
                     } else {
-                        tasks[taskCount] = new Deadline(input.substring(0, marker).trim(), input.substring(marker + 5).trim());
-                        taskCount++;
-                        printAddedTask(tasks[taskCount - 1], taskCount);
+                        tasks.add(new Deadline(input.substring(0, marker).trim(), input.substring(marker + 5).trim()));
+                        printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
-                } else if (command.trim().toLowerCase().startsWith("event ") && taskCount < MAX_TASKS) {
+                } else if (command.trim().toLowerCase().startsWith("event ") && tasks.size() < MAX_TASKS) {
                     String input = command.trim().substring("event ".length()).trim();
                     int fromMarker = input.indexOf(" /from ");
                     int toMarker = input.indexOf(" /to ", fromMarker + 7);
@@ -108,16 +123,15 @@ public class Murphy {
                         throw new MurphyException("An event needs a description, start, and end time, like: "
                                 + "event meeting /from 2pm /to 4pm");
                     } else {
-                        tasks[taskCount] = new Event(input.substring(0, fromMarker).trim(),
-                                input.substring(fromMarker + 7, toMarker).trim(), input.substring(toMarker + 5).trim());
-                        taskCount++;
-                        printAddedTask(tasks[taskCount - 1], taskCount);
+                        tasks.add(new Event(input.substring(0, fromMarker).trim(),
+                                input.substring(fromMarker + 7, toMarker).trim(), input.substring(toMarker + 5).trim()));
+                        printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
-                } else if (taskCount >= MAX_TASKS) {
+                } else if (tasks.size() >= MAX_TASKS) {
                     System.out.println("     I can't remember more than " + MAX_TASKS
                             + " tasks. My memory has reached its fixed-size finale.");
                 } else {
-                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, mark, or unmark.");
+                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, delete, mark, or unmark.");
                 }
                 } catch (MurphyException exception) {
                     System.out.println("     OOPS! " + exception.getMessage());
