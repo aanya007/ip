@@ -34,13 +34,14 @@ public class Murphy {
 
                 System.out.println(separator);
 
-                if (command.trim().equalsIgnoreCase("bye")) {
-                    System.out.println("Bye. Hope to see you again soon! Even command lines need a punchline.");
-                    System.out.println(separator);
-                    break;
-                }
+                try {
+                    if (command.trim().equalsIgnoreCase("bye")) {
+                        System.out.println("Bye. Hope to see you again soon! Even command lines need a punchline.");
+                        System.out.println(separator);
+                        break;
+                    }
 
-                if (command.trim().equalsIgnoreCase("list")) {
+                    if (command.trim().equalsIgnoreCase("list")) {
                     System.out.println("     Here are the tasks in your list:");
                     for (int i = 0; i < taskCount; i++) {
                         System.out.println("     " + (i + 1) + "." + tasks[i]);
@@ -75,16 +76,23 @@ public class Murphy {
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to unmark, like: unmark 2");
                     }
-                } else if (command.trim().toLowerCase().startsWith("todo ") && taskCount < MAX_TASKS) {
-                    String description = command.trim().substring("todo ".length()).trim();
+                } else if (command.trim().toLowerCase().startsWith("todo") && taskCount < MAX_TASKS) {
+                    String trimmedCommand = command.trim();
+                    String description = trimmedCommand.length() > "todo".length()
+                            ? trimmedCommand.substring("todo".length()).trim() : "";
+                    if (description.isEmpty()) {
+                        throw new MurphyException("A todo needs a description. Try: todo buy groceries");
+                    }
                     tasks[taskCount] = new Todo(description);
                     taskCount++;
                     printAddedTask(tasks[taskCount - 1], taskCount);
                 } else if (command.trim().toLowerCase().startsWith("deadline ") && taskCount < MAX_TASKS) {
                     String input = command.trim().substring("deadline ".length()).trim();
                     int marker = input.indexOf(" /by ");
-                    if (marker < 0) {
-                        System.out.println("     A deadline needs a date/time, like: deadline submit report /by Friday");
+                    if (marker < 0 || input.substring(0, marker).trim().isEmpty()
+                            || input.substring(marker + 5).trim().isEmpty()) {
+                        throw new MurphyException("A deadline needs a description and a date/time, like: "
+                                + "deadline submit report /by Friday");
                     } else {
                         tasks[taskCount] = new Deadline(input.substring(0, marker).trim(), input.substring(marker + 5).trim());
                         taskCount++;
@@ -94,8 +102,11 @@ public class Murphy {
                     String input = command.trim().substring("event ".length()).trim();
                     int fromMarker = input.indexOf(" /from ");
                     int toMarker = input.indexOf(" /to ", fromMarker + 7);
-                    if (fromMarker < 0 || toMarker < 0) {
-                        System.out.println("     An event needs a start and end time, like: event meeting /from 2pm /to 4pm");
+                    if (fromMarker < 0 || toMarker < 0 || input.substring(0, fromMarker).trim().isEmpty()
+                            || input.substring(fromMarker + 7, toMarker).trim().isEmpty()
+                            || input.substring(toMarker + 5).trim().isEmpty()) {
+                        throw new MurphyException("An event needs a description, start, and end time, like: "
+                                + "event meeting /from 2pm /to 4pm");
                     } else {
                         tasks[taskCount] = new Event(input.substring(0, fromMarker).trim(),
                                 input.substring(fromMarker + 7, toMarker).trim(), input.substring(toMarker + 5).trim());
@@ -106,7 +117,10 @@ public class Murphy {
                     System.out.println("     I can't remember more than " + MAX_TASKS
                             + " tasks. My memory has reached its fixed-size finale.");
                 } else {
-                    System.out.println("     I understand todo, deadline, event, list, mark, and unmark commands.");
+                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, mark, or unmark.");
+                }
+                } catch (MurphyException exception) {
+                    System.out.println("     OOPS! " + exception.getMessage());
                 }
                 System.out.println(separator);
             }
