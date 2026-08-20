@@ -43,8 +43,7 @@ public class Murphy {
                 if (command.trim().equalsIgnoreCase("list")) {
                     System.out.println("     Here are the tasks in your list:");
                     for (int i = 0; i < taskCount; i++) {
-                        System.out.println("     " + (i + 1) + ".[" + tasks[i].getType().getSymbol() + "]["
-                                + tasks[i].getStatusIcon() + "] " + tasks[i].getDisplayDescription());
+                        System.out.println("     " + (i + 1) + "." + tasks[i]);
                     }
                 } else if (command.trim().toLowerCase().startsWith("mark ")) {
                     String taskNumber = command.trim().substring("mark ".length()).trim();
@@ -78,7 +77,7 @@ public class Murphy {
                     }
                 } else if (command.trim().toLowerCase().startsWith("todo ") && taskCount < MAX_TASKS) {
                     String description = command.trim().substring("todo ".length()).trim();
-                    tasks[taskCount] = new Task(Task.Type.TODO, description, null, null);
+                    tasks[taskCount] = new Todo(description);
                     taskCount++;
                     printAddedTask(tasks[taskCount - 1], taskCount);
                 } else if (command.trim().toLowerCase().startsWith("deadline ") && taskCount < MAX_TASKS) {
@@ -87,8 +86,7 @@ public class Murphy {
                     if (marker < 0) {
                         System.out.println("     A deadline needs a date/time, like: deadline submit report /by Friday");
                     } else {
-                        tasks[taskCount] = new Task(Task.Type.DEADLINE, input.substring(0, marker).trim(),
-                                null, input.substring(marker + 5).trim());
+                        tasks[taskCount] = new Deadline(input.substring(0, marker).trim(), input.substring(marker + 5).trim());
                         taskCount++;
                         printAddedTask(tasks[taskCount - 1], taskCount);
                     }
@@ -99,7 +97,7 @@ public class Murphy {
                     if (fromMarker < 0 || toMarker < 0) {
                         System.out.println("     An event needs a start and end time, like: event meeting /from 2pm /to 4pm");
                     } else {
-                        tasks[taskCount] = new Task(Task.Type.EVENT, input.substring(0, fromMarker).trim(),
+                        tasks[taskCount] = new Event(input.substring(0, fromMarker).trim(),
                                 input.substring(fromMarker + 7, toMarker).trim(), input.substring(toMarker + 5).trim());
                         taskCount++;
                         printAddedTask(tasks[taskCount - 1], taskCount);
@@ -118,7 +116,7 @@ public class Murphy {
     /** Prints the confirmation shown after a task is successfully added. */
     private static void printAddedTask(Task task, int taskCount) {
         System.out.println("     Got it. I've added this task:");
-        System.out.println("       [" + task.getType().getSymbol() + "][ ] " + task.getDisplayDescription());
+        System.out.println("       " + task);
         System.out.println("     Now you have " + taskCount + " tasks in the list.");
     }
 }
