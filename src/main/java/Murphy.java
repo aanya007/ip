@@ -1,10 +1,12 @@
 import java.util.Scanner;
 
 /**
- * A friendly command-line chatbot that echoes user commands until it hears
- * the command {@code bye}.
+ * A friendly command-line chatbot that stores user-entered tasks in memory.
  */
 public class Murphy {
+    /** The maximum number of tasks Murphy can remember during one run. */
+    private static final int MAX_TASKS = 100;
+
     /**
      * Starts Murphy's conversation with the user.
      *
@@ -23,6 +25,9 @@ public class Murphy {
                 + "What can I do for you? (I promise not to judge your typing.)");
         System.out.println(separator);
 
+        String[] tasks = new String[MAX_TASKS];
+        int taskCount = 0;
+
         try (Scanner scanner = new Scanner(System.in)) {
             while (scanner.hasNextLine()) {
                 String command = scanner.nextLine();
@@ -35,7 +40,18 @@ public class Murphy {
                     break;
                 }
 
-                System.out.println("     " + command);
+                if (command.trim().equalsIgnoreCase("list")) {
+                    for (int i = 0; i < taskCount; i++) {
+                        System.out.println("     " + (i + 1) + ". " + tasks[i]);
+                    }
+                } else if (taskCount < MAX_TASKS) {
+                    tasks[taskCount] = command;
+                    taskCount++;
+                    System.out.println("     added: " + command);
+                } else {
+                    System.out.println("     I can't remember more than " + MAX_TASKS
+                            + " tasks. My memory has reached its fixed-size finale.");
+                }
                 System.out.println(separator);
             }
         }
