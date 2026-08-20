@@ -62,6 +62,21 @@ public class Murphy {
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to mark, like: mark 2");
                     }
+                } else if (command.trim().toLowerCase().startsWith("unmark ")) {
+                    String taskNumber = command.trim().substring("unmark ".length()).trim();
+                    try {
+                        int taskIndex = Integer.parseInt(taskNumber) - 1;
+                        if (taskIndex < 0 || taskIndex >= taskCount) {
+                            System.out.println("     I couldn't find that task. Please choose a number from 1 to "
+                                    + taskCount + ".");
+                        } else {
+                            completed[taskIndex] = false;
+                            System.out.println("     OK, I've marked this task as not done yet:");
+                            System.out.println("       [ ] " + tasks[taskIndex]);
+                        }
+                    } catch (NumberFormatException exception) {
+                        System.out.println("     Please tell me which task number to unmark, like: unmark 2");
+                    }
                 } else if (taskCount < MAX_TASKS) {
                     tasks[taskCount] = command;
                     taskCount++;
