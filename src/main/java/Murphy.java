@@ -1,3 +1,7 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -9,12 +13,15 @@ public class Murphy {
     /** The maximum number of tasks Murphy can remember during one run. */
     private static final int MAX_TASKS = 100;
 
+    /** The relative path of Murphy's task data file. */
+    private static final Path DATA_FILE_PATH = Paths.get("data", "duke.txt");
+
     /**
      * Starts Murphy's conversation with the user.
      *
      * @param args command-line arguments, which Murphy does not need
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String separator = "____________________________________________________________";
         String banner = "M   M  U   U  RRRR   PPPP   H   H  Y   Y\n"
                 + "MM MM  U   U  R   R  P   P  H   H   Y Y\n"
@@ -56,6 +63,7 @@ public class Murphy {
                                     + tasks.size() + ".");
                         } else {
                             Task deletedTask = tasks.remove(taskIndex);
+                            saveTasks(tasks);
                             System.out.println("     Noted. I've removed this task:");
                             System.out.println("       " + deletedTask);
                             System.out.println("     Now you have " + tasks.size() + " tasks in the list.");
@@ -72,6 +80,7 @@ public class Murphy {
                                     + tasks.size() + ".");
                         } else {
                             tasks.get(taskIndex).markAsDone();
+                            saveTasks(tasks);
                             System.out.println("     Nice! I've marked this task as done:");
                             System.out.println("       [X] " + tasks.get(taskIndex).getDescription());
                         }
@@ -87,6 +96,7 @@ public class Murphy {
                                     + tasks.size() + ".");
                         } else {
                             tasks.get(taskIndex).markAsNotDone();
+                            saveTasks(tasks);
                             System.out.println("     OK, I've marked this task as not done yet:");
                             System.out.println("       [ ] " + tasks.get(taskIndex).getDescription());
                         }
@@ -101,6 +111,7 @@ public class Murphy {
                         throw new MurphyException("A todo needs a description. Try: todo buy groceries");
                     }
                     tasks.add(new Todo(description));
+                    saveTasks(tasks);
                     printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                 } else if (command.trim().toLowerCase().startsWith("deadline ") && tasks.size() < MAX_TASKS) {
                     String input = command.trim().substring("deadline ".length()).trim();
@@ -111,6 +122,7 @@ public class Murphy {
                                 + "deadline submit report /by Friday");
                     } else {
                         tasks.add(new Deadline(input.substring(0, marker).trim(), input.substring(marker + 5).trim()));
+                        saveTasks(tasks);
                         printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
                 } else if (command.trim().toLowerCase().startsWith("event ") && tasks.size() < MAX_TASKS) {
@@ -125,6 +137,7 @@ public class Murphy {
                     } else {
                         tasks.add(new Event(input.substring(0, fromMarker).trim(),
                                 input.substring(fromMarker + 7, toMarker).trim(), input.substring(toMarker + 5).trim()));
+                        saveTasks(tasks);
                         printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
                 } else if (tasks.size() >= MAX_TASKS) {
@@ -146,5 +159,19 @@ public class Murphy {
         System.out.println("     Got it. I've added this task:");
         System.out.println("       " + task);
         System.out.println("     Now you have " + taskCount + " tasks in the list.");
+    }
+
+    /**
+     * Writes the current task list to Murphy's data file.
+     *
+     * @param tasks tasks to save
+     * @throws IOException if the task data cannot be written
+     */
+    private static void saveTasks(List<Task> tasks) throws IOException {
+        List<String> taskData = new ArrayList<>();
+        for (Task task : tasks) {
+            taskData.add(task.toDataString());
+        }
+        Files.write(DATA_FILE_PATH, taskData);
     }
 }
