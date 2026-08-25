@@ -38,6 +38,17 @@ Murphy should have a distinctive, friendly, and witty personality. Future chatbo
 
 Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
 
+## Post-update checks:
+
+For changes that add, remove, or alter observable command-line behavior:
+
+1. Review and update `test/ui-test-plan.md`. Keep each affected test case's aim, inputs, and expected output current.
+2. Invoke the project-local `test-ui` skill using the test cases in `test/ui-test-plan.md`. Stop at the first failed test and report the complete actual and expected outputs.
+
+For any implementation change that should be reviewed visually, invoke the project-local `present-changes-visually` skill. The requested `test-changes-visually` skill refers to this existing skill.
+
+Do not invoke `test-ui` for documentation-only changes, comments, formatting, or refactors whose observable behavior is unchanged unless the user explicitly requests testing. Use judgment for other changes and explain when a test run is unnecessary.
+
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.
