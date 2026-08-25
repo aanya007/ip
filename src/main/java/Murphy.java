@@ -34,7 +34,7 @@ public class Murphy {
                 + "What can I do for you? (I promise not to judge your typing.)");
         System.out.println(separator);
 
-        List<Task> tasks = new ArrayList<>();
+        List<Task> tasks = loadTasks();
 
         try (Scanner scanner = new Scanner(System.in)) {
             while (scanner.hasNextLine()) {
@@ -173,5 +173,32 @@ public class Murphy {
             taskData.add(task.toDataString());
         }
         Files.write(DATA_FILE_PATH, taskData);
+    }
+
+    /**
+     * Reads Murphy's task list from the data file.
+     *
+     * @return tasks reconstructed from the saved data
+     * @throws IOException if the task data cannot be read
+     */
+    private static List<Task> loadTasks() throws IOException {
+        List<Task> tasks = new ArrayList<>();
+        for (String line : Files.readAllLines(DATA_FILE_PATH)) {
+            String[] taskData = line.split(" \\| ");
+            Task task;
+            if (taskData[0].equals("T")) {
+                task = new Todo(taskData[2]);
+            } else if (taskData[0].equals("D")) {
+                task = new Deadline(taskData[2], taskData[3]);
+            } else {
+                task = new Event(taskData[2], taskData[3], taskData[4]);
+            }
+
+            if (taskData[1].equals("1")) {
+                task.markAsDone();
+            }
+            tasks.add(task);
+        }
+        return tasks;
     }
 }

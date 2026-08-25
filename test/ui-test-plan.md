@@ -8,19 +8,24 @@ This file is the source of truth for console-level UI tests. Add each test case 
 - **Working directory:** repository root
 - **Java version:** Java 25 (`sdk use java 25.0.3.fx-zulu` on macOS, if needed)
 - **Output comparison:** exact stdout/stderr, including prompts, whitespace, and line breaks
-- **Environment assumption:** The `data` directory exists because this round tests only the writing happy path.
+- **Environment assumption:** `data/duke.txt` exists and contains the valid task data shown below because this round tests only the reading happy path.
 
-## Test Case: Save task-list changes
+## Test Case: Load saved tasks
 
-**Aim:** Verify that commands which add, mark, unmark, and delete tasks still produce the expected console output while Murphy saves each successful change.
+**Aim:** Verify that Murphy loads saved todos, deadlines, and events, including their completion states, when it starts.
+
+**Data file before test:**
+
+```text
+T | 1 | read book
+D | 0 | submit report | Friday
+E | 1 | project meeting | 2pm | 4pm
+```
 
 **Inputs:**
 
 ```text
-todo read book
-mark 1
-unmark 1
-delete 1
+list
 bye
 ```
 
@@ -37,22 +42,10 @@ Hi there! I'm Murphy, your command-line conversationalist.
 What can I do for you? (I promise not to judge your typing.)
 ____________________________________________________________
 ____________________________________________________________
-     Got it. I've added this task:
-       [T][ ] read book
-     Now you have 1 tasks in the list.
-____________________________________________________________
-____________________________________________________________
-     Nice! I've marked this task as done:
-       [X] read book
-____________________________________________________________
-____________________________________________________________
-     OK, I've marked this task as not done yet:
-       [ ] read book
-____________________________________________________________
-____________________________________________________________
-     Noted. I've removed this task:
-       [T][ ] read book
-     Now you have 0 tasks in the list.
+     Here are the tasks in your list:
+     1.[T][X] read book
+     2.[D][ ] submit report (by: Friday)
+     3.[E][X] project meeting (from: 2pm to: 4pm)
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon! Even command lines need a punchline.
