@@ -23,24 +23,26 @@ public class Murphy {
         Ui ui = new Ui();
         ui.showWelcome();
         Storage storage = new Storage(DATA_FILE_PATH, MAX_TASKS, ui);
+        Parser parser = new Parser();
 
         List<Task> tasks = storage.load();
 
         try (ui) {
             while (ui.hasNextCommand()) {
                 String command = ui.readCommand();
+                Parser.ParsedCommand parsedCommand = parser.parse(command);
 
                 ui.showSeparator();
 
                 try {
-                    if (command.trim().equalsIgnoreCase("bye")) {
+                    if (parsedCommand.command() == Parser.Command.BYE) {
                         ui.showMessage("Bye. Hope to see you again soon! Even command lines need a punchline.");
                         ui.showSeparator();
                         break;
                     }
 
-                    if (command.trim().toLowerCase().startsWith("on ")) {
-                    String dateText = command.trim().substring("on ".length()).trim();
+                    if (parsedCommand.command() == Parser.Command.ON) {
+                    String dateText = parsedCommand.argument();
                     try {
                         LocalDate date = LocalDate.parse(dateText);
                         System.out.println("     Tasks on " + date + ":");
@@ -58,13 +60,13 @@ public class Murphy {
                     } catch (DateTimeParseException exception) {
                         throw new MurphyException("Please enter the date as yyyy-MM-dd, like: 2019-10-15");
                     }
-                } else if (command.trim().equalsIgnoreCase("list")) {
+                } else if (parsedCommand.command() == Parser.Command.LIST) {
                     System.out.println("     Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
                         System.out.println("     " + (i + 1) + "." + tasks.get(i));
                     }
-                } else if (command.trim().toLowerCase().startsWith("delete ")) {
-                    String taskNumber = command.trim().substring("delete ".length()).trim();
+                } else if (parsedCommand.command() == Parser.Command.DELETE) {
+                    String taskNumber = parsedCommand.argument();
                     try {
                         int taskIndex = Integer.parseInt(taskNumber) - 1;
                         if (taskIndex < 0 || taskIndex >= tasks.size()) {
@@ -80,8 +82,8 @@ public class Murphy {
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to delete, like: delete 2");
                     }
-                } else if (command.trim().toLowerCase().startsWith("mark ")) {
-                    String taskNumber = command.trim().substring("mark ".length()).trim();
+                } else if (parsedCommand.command() == Parser.Command.MARK) {
+                    String taskNumber = parsedCommand.argument();
                     try {
                         int taskIndex = Integer.parseInt(taskNumber) - 1;
                         if (taskIndex < 0 || taskIndex >= tasks.size()) {
@@ -96,8 +98,8 @@ public class Murphy {
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to mark, like: mark 2");
                     }
-                } else if (command.trim().toLowerCase().startsWith("unmark ")) {
-                    String taskNumber = command.trim().substring("unmark ".length()).trim();
+                } else if (parsedCommand.command() == Parser.Command.UNMARK) {
+                    String taskNumber = parsedCommand.argument();
                     try {
                         int taskIndex = Integer.parseInt(taskNumber) - 1;
                         if (taskIndex < 0 || taskIndex >= tasks.size()) {
@@ -112,8 +114,8 @@ public class Murphy {
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to unmark, like: unmark 2");
                     }
-                } else if (command.trim().toLowerCase().startsWith("todo") && tasks.size() < MAX_TASKS) {
-                    String trimmedCommand = command.trim();
+                } else if (parsedCommand.command() == Parser.Command.TODO && tasks.size() < MAX_TASKS) {
+                    String trimmedCommand = parsedCommand.originalText();
                     String description = trimmedCommand.length() > "todo".length()
                             ? trimmedCommand.substring("todo".length()).trim() : "";
                     if (description.isEmpty()) {
@@ -122,8 +124,8 @@ public class Murphy {
                     tasks.add(new Todo(description));
                     storage.save(tasks);
                     printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
-                } else if (command.trim().toLowerCase().startsWith("deadline ") && tasks.size() < MAX_TASKS) {
-                    String input = command.trim().substring("deadline ".length()).trim();
+                } else if (parsedCommand.command() == Parser.Command.DEADLINE && tasks.size() < MAX_TASKS) {
+                    String input = parsedCommand.argument();
                     int marker = input.indexOf(" /by ");
                     if (marker < 0 || input.substring(0, marker).trim().isEmpty()
                             || input.substring(marker + 5).trim().isEmpty()) {
@@ -139,8 +141,8 @@ public class Murphy {
                         storage.save(tasks);
                         printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
-                } else if (command.trim().toLowerCase().startsWith("event ") && tasks.size() < MAX_TASKS) {
-                    String input = command.trim().substring("event ".length()).trim();
+                } else if (parsedCommand.command() == Parser.Command.EVENT && tasks.size() < MAX_TASKS) {
+                    String input = parsedCommand.argument();
                     int fromMarker = input.indexOf(" /from ");
                     int toMarker = input.indexOf(" /to ", fromMarker + 7);
                     if (fromMarker < 0 || toMarker < 0 || input.substring(0, fromMarker).trim().isEmpty()
