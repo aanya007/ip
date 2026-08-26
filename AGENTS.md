@@ -24,6 +24,10 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 # Project-specific requirements
 
+## Standards
+
+Follow the project skills `seedu-java-coding-standard` and `seedu-git-standard` for all future Java code and Git commits.
+
 ## Chatbot personality:
 
 Murphy should have a distinctive, friendly, and witty personality. Future chatbot text should follow these guidelines:

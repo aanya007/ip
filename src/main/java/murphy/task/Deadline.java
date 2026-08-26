@@ -6,12 +6,12 @@ import java.util.Locale;
 
 /** A task that must be completed by a specified date. */
 public class Deadline extends Task {
-    /** The date by which this task must be completed. */
-    private final LocalDate by;
-
     /** The format used when displaying a deadline to the user. */
     private static final DateTimeFormatter DISPLAY_FORMATTER =
             DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
+
+    /** The date by which this task must be completed. */
+    private final LocalDate by;
 
     /** Creates an incomplete deadline task. */
     public Deadline(String description, LocalDate by) {

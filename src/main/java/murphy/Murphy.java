@@ -55,24 +55,24 @@ public class Murphy {
                     }
 
                     if (parsedCommand.command() == Parser.Command.ON) {
-                    String dateText = parsedCommand.argument();
-                    try {
-                        LocalDate date = LocalDate.parse(dateText);
-                        System.out.println("     Tasks on " + date + ":");
-                        int matchingTasks = 0;
-                        for (Task task : tasks) {
-                            if ((task instanceof Deadline && ((Deadline) task).occursOn(date))
-                                    || (task instanceof Event && ((Event) task).occursOn(date))) {
-                                matchingTasks++;
-                                System.out.println("     " + matchingTasks + "." + task);
+                        String dateText = parsedCommand.argument();
+                        try {
+                            LocalDate date = LocalDate.parse(dateText);
+                            System.out.println("     Tasks on " + date + ":");
+                            int matchingTasks = 0;
+                            for (Task task : tasks) {
+                                if ((task instanceof Deadline && ((Deadline) task).occursOn(date))
+                                        || (task instanceof Event && ((Event) task).occursOn(date))) {
+                                    matchingTasks++;
+                                    System.out.println("     " + matchingTasks + "." + task);
+                                }
                             }
+                            if (matchingTasks == 0) {
+                                System.out.println("     No deadlines or events found on that date.");
+                            }
+                        } catch (DateTimeParseException exception) {
+                            throw new MurphyException("Please enter the date as yyyy-MM-dd, like: 2019-10-15");
                         }
-                        if (matchingTasks == 0) {
-                            System.out.println("     No deadlines or events found on that date.");
-                        }
-                    } catch (DateTimeParseException exception) {
-                        throw new MurphyException("Please enter the date as yyyy-MM-dd, like: 2019-10-15");
-                    }
                 } else if (parsedCommand.command() == Parser.Command.LIST) {
                     System.out.println("     Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
