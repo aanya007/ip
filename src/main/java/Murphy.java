@@ -1,11 +1,7 @@
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,8 +22,9 @@ public class Murphy {
     public static void main(String[] args) {
         Ui ui = new Ui();
         ui.showWelcome();
+        Storage storage = new Storage(DATA_FILE_PATH, MAX_TASKS, ui);
 
-        List<Task> tasks = loadTasks();
+        List<Task> tasks = storage.load();
 
         try (ui) {
             while (ui.hasNextCommand()) {
@@ -75,7 +72,7 @@ public class Murphy {
                                     + tasks.size() + ".");
                         } else {
                             Task deletedTask = tasks.remove(taskIndex);
-                            saveTasks(tasks);
+                            storage.save(tasks);
                             System.out.println("     Noted. I've removed this task:");
                             System.out.println("       " + deletedTask);
                             System.out.println("     Now you have " + tasks.size() + " tasks in the list.");
@@ -92,7 +89,7 @@ public class Murphy {
                                     + tasks.size() + ".");
                         } else {
                             tasks.get(taskIndex).markAsDone();
-                            saveTasks(tasks);
+                            storage.save(tasks);
                             System.out.println("     Nice! I've marked this task as done:");
                             System.out.println("       [X] " + tasks.get(taskIndex).getDescription());
                         }
@@ -108,7 +105,7 @@ public class Murphy {
                                     + tasks.size() + ".");
                         } else {
                             tasks.get(taskIndex).markAsNotDone();
-                            saveTasks(tasks);
+                            storage.save(tasks);
                             System.out.println("     OK, I've marked this task as not done yet:");
                             System.out.println("       [ ] " + tasks.get(taskIndex).getDescription());
                         }
@@ -123,7 +120,7 @@ public class Murphy {
                         throw new MurphyException("A todo needs a description. Try: todo buy groceries");
                     }
                     tasks.add(new Todo(description));
-                    saveTasks(tasks);
+                    storage.save(tasks);
                     printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                 } else if (command.trim().toLowerCase().startsWith("deadline ") && tasks.size() < MAX_TASKS) {
                     String input = command.trim().substring("deadline ".length()).trim();
@@ -139,7 +136,7 @@ public class Murphy {
                         } catch (DateTimeParseException exception) {
                             throw new MurphyException("Please enter the deadline date as yyyy-MM-dd, like: 2019-10-15");
                         }
-                        saveTasks(tasks);
+                        storage.save(tasks);
                         printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
                 } else if (command.trim().toLowerCase().startsWith("event ") && tasks.size() < MAX_TASKS) {
@@ -154,7 +151,7 @@ public class Murphy {
                     } else {
                         tasks.add(new Event(input.substring(0, fromMarker).trim(),
                                 input.substring(fromMarker + 7, toMarker).trim(), input.substring(toMarker + 5).trim()));
-                        saveTasks(tasks);
+                        storage.save(tasks);
                         printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
                 } else if (tasks.size() >= MAX_TASKS) {
@@ -176,128 +173,5 @@ public class Murphy {
         System.out.println("     Got it. I've added this task:");
         System.out.println("       " + task);
         System.out.println("     Now you have " + taskCount + " tasks in the list.");
-    }
-
-    /**
-     * Writes the current task list to Murphy's data file.
-     *
-     * @param tasks tasks to save
-     * @throws MurphyException if the task data cannot be written
-     */
-    private static void saveTasks(List<Task> tasks) throws MurphyException {
-        List<String> taskData = new ArrayList<>();
-        for (Task task : tasks) {
-            taskData.add(task.toDataString());
-        }
-        try {
-            Files.createDirectories(DATA_FILE_PATH.getParent());
-            Files.write(DATA_FILE_PATH, taskData, StandardCharsets.UTF_8);
-        } catch (IOException exception) {
-            throw new MurphyException("I changed the task list in memory, but couldn't save it to disk.");
-        }
-    }
-
-    /**
-     * Reads Murphy's task list from the data file.
-     *
-     * @return tasks reconstructed from the saved data
-     */
-    private static List<Task> loadTasks() {
-        List<Task> tasks = new ArrayList<>();
-        if (Files.notExists(DATA_FILE_PATH)) {
-            return tasks;
-        }
-
-        try {
-            List<String> lines = Files.readAllLines(DATA_FILE_PATH, StandardCharsets.UTF_8);
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.isBlank()) {
-                    continue;
-                }
-                if (tasks.size() >= MAX_TASKS) {
-                    System.out.println("     OOPS! The save file has more than " + MAX_TASKS
-                            + " tasks, so I loaded only the first " + MAX_TASKS + ".");
-                    break;
-                }
-
-                try {
-                    tasks.add(parseTask(line));
-                } catch (IllegalArgumentException exception) {
-                    System.out.println("     OOPS! I skipped corrupted save-file line " + (i + 1) + ".");
-                }
-            }
-        } catch (IOException exception) {
-            System.out.println("     OOPS! I couldn't read the save file, so I'm starting with an empty list.");
-            tasks.clear();
-        }
-        return tasks;
-    }
-
-    /** Converts one validated save-file line into a task. */
-    private static Task parseTask(String line) {
-        List<String> taskData = splitDataFields(line);
-        if (taskData.size() < 2 || (!taskData.get(1).equals("0") && !taskData.get(1).equals("1"))) {
-            throw new IllegalArgumentException("Invalid task status");
-        }
-
-        String taskType = taskData.get(0);
-        int expectedFieldCount;
-        if (taskType.equals("T")) {
-            expectedFieldCount = 3;
-        } else if (taskType.equals("D")) {
-            expectedFieldCount = 4;
-        } else if (taskType.equals("E")) {
-            expectedFieldCount = 5;
-        } else {
-            throw new IllegalArgumentException("Unknown task type");
-        }
-
-        if (taskData.size() != expectedFieldCount) {
-            throw new IllegalArgumentException("Incorrect field count");
-        }
-        for (int i = 2; i < taskData.size(); i++) {
-            if (taskData.get(i).isBlank()) {
-                throw new IllegalArgumentException("Missing task detail");
-            }
-        }
-
-        Task task;
-        if (taskType.equals("T")) {
-            task = new Todo(taskData.get(2));
-        } else if (taskType.equals("D")) {
-            try {
-                task = new Deadline(taskData.get(2), LocalDate.parse(taskData.get(3)));
-            } catch (DateTimeParseException exception) {
-                throw new IllegalArgumentException("Invalid deadline date", exception);
-            }
-        } else {
-            task = new Event(taskData.get(2), taskData.get(3), taskData.get(4));
-        }
-        if (taskData.get(1).equals("1")) {
-            task.markAsDone();
-        }
-        return task;
-    }
-
-    /** Splits a save-file line while preserving escaped pipes and backslashes. */
-    private static List<String> splitDataFields(String line) {
-        List<String> fields = new ArrayList<>();
-        StringBuilder field = new StringBuilder();
-        for (int i = 0; i < line.length(); i++) {
-            char character = line.charAt(i);
-            if (character == '\\' && i + 1 < line.length()
-                    && (line.charAt(i + 1) == '|' || line.charAt(i + 1) == '\\')) {
-                field.append(line.charAt(i + 1));
-                i++;
-            } else if (character == '|') {
-                fields.add(field.toString().trim());
-                field.setLength(0);
-            } else {
-                field.append(character);
-            }
-        }
-        fields.add(field.toString().trim());
-        return fields;
     }
 }
