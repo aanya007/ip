@@ -8,6 +8,7 @@ public class Parser {
     }
 
     /** The result of parsing one input line. */
+    /** Holds the command recognized from one input line and its text arguments. */
     public record ParsedCommand(Command command, String argument, String originalText) { }
 
     /** Parses a raw command without validating command-specific arguments. */
