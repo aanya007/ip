@@ -23,3 +23,20 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
    ```
 
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+
+## Creating and running the executable JAR
+
+Use Java 25 and run the Shadow plugin task from the project root:
+
+```bash
+sdk use java 25.0.3.fx-zulu
+./gradlew shadowJar
+```
+
+The executable fat JAR is created at `build/libs/duke.jar`. It contains Murphy and the project's runtime dependencies, so it can be copied by itself into an empty folder and run with:
+
+```bash
+java -jar "duke.jar"
+```
+
+The JAR is a generated build artifact and should not be committed to Git. For distribution, attach it to a GitHub release instead.
