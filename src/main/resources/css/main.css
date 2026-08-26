@@ -1,0 +1,9 @@
+.root { -fx-background-color: #f4f8fb; }
+.text-field { -fx-font-size: 14px; -fx-padding: 9px; }
+.button { -fx-background-color: #315c83; -fx-text-fill: white; -fx-font-weight: bold; }
+.button:hover { -fx-background-color: #4d86b3; }
+.scroll-pane, .scroll-pane .viewport { -fx-background-color: transparent; }
+.dialog-box { -fx-padding: 6px; }
+.dialog-box .label { -fx-background-color: #dceeff; -fx-background-radius: 12px; -fx-padding: 8px; }
+.reply-box .label { -fx-background-color: #fff1c7; }
+.reply-box { -fx-alignment: TOP_LEFT; }
