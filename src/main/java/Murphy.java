@@ -35,7 +35,8 @@ public class Murphy {
 
                 try {
                     if (parsedCommand.command() == Parser.Command.BYE) {
-                        ui.showMessage("Bye. Hope to see you again soon! Even command lines need a punchline.");
+                        Command exitCommand = new ExitCommand();
+                        exitCommand.execute(tasks, ui, storage);
                         ui.showSeparator();
                         break;
                     }
