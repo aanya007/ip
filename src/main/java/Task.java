@@ -61,7 +61,12 @@ public class Task {
      * @return a pipe-separated representation of this task
      */
     public String toDataString() {
-        return "T | " + (isDone() ? "1" : "0") + " | " + description;
+        return "T | " + (isDone() ? "1" : "0") + " | " + escapeDataField(description);
+    }
+
+    /** Escapes characters that have a special meaning in Murphy's save-file format. */
+    protected static String escapeDataField(String value) {
+        return value.replace("\\", "\\\\").replace("|", "\\|");
     }
 
     /** Returns the common task text, including its type and completion state. */

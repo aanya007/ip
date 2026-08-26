@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,7 +22,7 @@ public class Murphy {
      *
      * @param args command-line arguments, which Murphy does not need
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         String separator = "____________________________________________________________";
         String banner = "M   M  U   U  RRRR   PPPP   H   H  Y   Y\n"
                 + "MM MM  U   U  R   R  P   P  H   H   Y Y\n"
@@ -165,40 +166,118 @@ public class Murphy {
      * Writes the current task list to Murphy's data file.
      *
      * @param tasks tasks to save
-     * @throws IOException if the task data cannot be written
+     * @throws MurphyException if the task data cannot be written
      */
-    private static void saveTasks(List<Task> tasks) throws IOException {
+    private static void saveTasks(List<Task> tasks) throws MurphyException {
         List<String> taskData = new ArrayList<>();
         for (Task task : tasks) {
             taskData.add(task.toDataString());
         }
-        Files.write(DATA_FILE_PATH, taskData);
+        try {
+            Files.createDirectories(DATA_FILE_PATH.getParent());
+            Files.write(DATA_FILE_PATH, taskData, StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            throw new MurphyException("I changed the task list in memory, but couldn't save it to disk.");
+        }
     }
 
     /**
      * Reads Murphy's task list from the data file.
      *
      * @return tasks reconstructed from the saved data
-     * @throws IOException if the task data cannot be read
      */
-    private static List<Task> loadTasks() throws IOException {
+    private static List<Task> loadTasks() {
         List<Task> tasks = new ArrayList<>();
-        for (String line : Files.readAllLines(DATA_FILE_PATH)) {
-            String[] taskData = line.split(" \\| ");
-            Task task;
-            if (taskData[0].equals("T")) {
-                task = new Todo(taskData[2]);
-            } else if (taskData[0].equals("D")) {
-                task = new Deadline(taskData[2], taskData[3]);
-            } else {
-                task = new Event(taskData[2], taskData[3], taskData[4]);
-            }
+        if (Files.notExists(DATA_FILE_PATH)) {
+            return tasks;
+        }
 
-            if (taskData[1].equals("1")) {
-                task.markAsDone();
+        try {
+            List<String> lines = Files.readAllLines(DATA_FILE_PATH, StandardCharsets.UTF_8);
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.isBlank()) {
+                    continue;
+                }
+                if (tasks.size() >= MAX_TASKS) {
+                    System.out.println("     OOPS! The save file has more than " + MAX_TASKS
+                            + " tasks, so I loaded only the first " + MAX_TASKS + ".");
+                    break;
+                }
+
+                try {
+                    tasks.add(parseTask(line));
+                } catch (IllegalArgumentException exception) {
+                    System.out.println("     OOPS! I skipped corrupted save-file line " + (i + 1) + ".");
+                }
             }
-            tasks.add(task);
+        } catch (IOException exception) {
+            System.out.println("     OOPS! I couldn't read the save file, so I'm starting with an empty list.");
+            tasks.clear();
         }
         return tasks;
+    }
+
+    /** Converts one validated save-file line into a task. */
+    private static Task parseTask(String line) {
+        List<String> taskData = splitDataFields(line);
+        if (taskData.size() < 2 || (!taskData.get(1).equals("0") && !taskData.get(1).equals("1"))) {
+            throw new IllegalArgumentException("Invalid task status");
+        }
+
+        String taskType = taskData.get(0);
+        int expectedFieldCount;
+        if (taskType.equals("T")) {
+            expectedFieldCount = 3;
+        } else if (taskType.equals("D")) {
+            expectedFieldCount = 4;
+        } else if (taskType.equals("E")) {
+            expectedFieldCount = 5;
+        } else {
+            throw new IllegalArgumentException("Unknown task type");
+        }
+
+        if (taskData.size() != expectedFieldCount) {
+            throw new IllegalArgumentException("Incorrect field count");
+        }
+        for (int i = 2; i < taskData.size(); i++) {
+            if (taskData.get(i).isBlank()) {
+                throw new IllegalArgumentException("Missing task detail");
+            }
+        }
+
+        Task task;
+        if (taskType.equals("T")) {
+            task = new Todo(taskData.get(2));
+        } else if (taskType.equals("D")) {
+            task = new Deadline(taskData.get(2), taskData.get(3));
+        } else {
+            task = new Event(taskData.get(2), taskData.get(3), taskData.get(4));
+        }
+        if (taskData.get(1).equals("1")) {
+            task.markAsDone();
+        }
+        return task;
+    }
+
+    /** Splits a save-file line while preserving escaped pipes and backslashes. */
+    private static List<String> splitDataFields(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder field = new StringBuilder();
+        for (int i = 0; i < line.length(); i++) {
+            char character = line.charAt(i);
+            if (character == '\\' && i + 1 < line.length()
+                    && (line.charAt(i + 1) == '|' || line.charAt(i + 1) == '\\')) {
+                field.append(line.charAt(i + 1));
+                i++;
+            } else if (character == '|') {
+                fields.add(field.toString().trim());
+                field.setLength(0);
+            } else {
+                field.append(character);
+            }
+        }
+        fields.add(field.toString().trim());
+        return fields;
     }
 }
