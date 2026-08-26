@@ -3,6 +3,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -50,7 +52,26 @@ public class Murphy {
                         break;
                     }
 
-                    if (command.trim().equalsIgnoreCase("list")) {
+                    if (command.trim().toLowerCase().startsWith("on ")) {
+                    String dateText = command.trim().substring("on ".length()).trim();
+                    try {
+                        LocalDate date = LocalDate.parse(dateText);
+                        System.out.println("     Tasks on " + date + ":");
+                        int matchingTasks = 0;
+                        for (Task task : tasks) {
+                            if ((task instanceof Deadline && ((Deadline) task).occursOn(date))
+                                    || (task instanceof Event && ((Event) task).occursOn(date))) {
+                                matchingTasks++;
+                                System.out.println("     " + matchingTasks + "." + task);
+                            }
+                        }
+                        if (matchingTasks == 0) {
+                            System.out.println("     No deadlines or events found on that date.");
+                        }
+                    } catch (DateTimeParseException exception) {
+                        throw new MurphyException("Please enter the date as yyyy-MM-dd, like: 2019-10-15");
+                    }
+                } else if (command.trim().equalsIgnoreCase("list")) {
                     System.out.println("     Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
                         System.out.println("     " + (i + 1) + "." + tasks.get(i));
@@ -120,9 +141,14 @@ public class Murphy {
                     if (marker < 0 || input.substring(0, marker).trim().isEmpty()
                             || input.substring(marker + 5).trim().isEmpty()) {
                         throw new MurphyException("A deadline needs a description and a date/time, like: "
-                                + "deadline submit report /by Friday");
+                                + "deadline submit report /by 2019-10-15");
                     } else {
-                        tasks.add(new Deadline(input.substring(0, marker).trim(), input.substring(marker + 5).trim()));
+                        String dateText = input.substring(marker + 5).trim();
+                        try {
+                            tasks.add(new Deadline(input.substring(0, marker).trim(), LocalDate.parse(dateText)));
+                        } catch (DateTimeParseException exception) {
+                            throw new MurphyException("Please enter the deadline date as yyyy-MM-dd, like: 2019-10-15");
+                        }
                         saveTasks(tasks);
                         printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
@@ -145,7 +171,7 @@ public class Murphy {
                     System.out.println("     I can't remember more than " + MAX_TASKS
                             + " tasks. My memory has reached its fixed-size finale.");
                 } else {
-                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, delete, mark, or unmark.");
+                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, on, delete, mark, or unmark.");
                 }
                 } catch (MurphyException exception) {
                     System.out.println("     OOPS! " + exception.getMessage());
@@ -250,7 +276,11 @@ public class Murphy {
         if (taskType.equals("T")) {
             task = new Todo(taskData.get(2));
         } else if (taskType.equals("D")) {
-            task = new Deadline(taskData.get(2), taskData.get(3));
+            try {
+                task = new Deadline(taskData.get(2), LocalDate.parse(taskData.get(3)));
+            } catch (DateTimeParseException exception) {
+                throw new IllegalArgumentException("Invalid deadline date", exception);
+            }
         } else {
             task = new Event(taskData.get(2), taskData.get(3), taskData.get(4));
         }
