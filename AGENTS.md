@@ -49,6 +49,10 @@ For any implementation change that should be reviewed visually, invoke the proje
 
 Do not invoke `test-ui` for documentation-only changes, comments, formatting, or refactors whose observable behavior is unchanged unless the user explicitly requests testing. Use judgment for other changes and explain when a test run is unnecessary.
 
+## JUnit coverage target
+
+Use JUnit to cover the highest-value approximately 50% of non-trivial public methods, prioritizing core business logic and complex behavior. Update the relevant JUnit tests after every code change so that this coverage target remains current.
+
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.
