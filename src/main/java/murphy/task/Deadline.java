@@ -24,12 +24,14 @@ public class Deadline extends Task {
         return by.equals(date);
     }
 
+    /** Returns this deadline in Murphy's save-file format. */
     @Override
     public String toDataString() {
         return "D | " + (isDone() ? "1" : "0") + " | " + escapeDataField(description)
                 + " | " + escapeDataField(by.toString());
     }
 
+    /** Returns the display text for this deadline. */
     @Override
     public String toString() {
         return "[D][" + getStatusIcon() + "] " + description + " (by: "

@@ -30,12 +30,14 @@ public class Event extends Task {
         }
     }
 
+    /** Returns this event in Murphy's save-file format. */
     @Override
     public String toDataString() {
         return "E | " + (isDone() ? "1" : "0") + " | " + escapeDataField(description)
                 + " | " + escapeDataField(from) + " | " + escapeDataField(to);
     }
 
+    /** Returns the display text for this event. */
     @Override
     public String toString() {
         return "[E][" + getStatusIcon() + "] " + description
