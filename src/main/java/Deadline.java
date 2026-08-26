@@ -1,10 +1,18 @@
-/** A task that must be completed by a specified date or time. */
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+/** A task that must be completed by a specified date. */
 public class Deadline extends Task {
-    /** The deadline text, kept as entered by the user. */
-    private final String by;
+    /** The date by which this task must be completed. */
+    private final LocalDate by;
+
+    /** The format used when displaying a deadline to the user. */
+    private static final DateTimeFormatter DISPLAY_FORMATTER =
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
     /** Creates an incomplete deadline task. */
-    public Deadline(String description, String by) {
+    public Deadline(String description, LocalDate by) {
         super(description);
         this.by = by;
     }
@@ -12,11 +20,12 @@ public class Deadline extends Task {
     @Override
     public String toDataString() {
         return "D | " + (isDone() ? "1" : "0") + " | " + escapeDataField(description)
-                + " | " + escapeDataField(by);
+                + " | " + escapeDataField(by.toString());
     }
 
     @Override
     public String toString() {
-        return "[D][" + getStatusIcon() + "] " + description + " (by: " + by + ")";
+        return "[D][" + getStatusIcon() + "] " + description + " (by: "
+                + by.format(DISPLAY_FORMATTER) + ")";
     }
 }

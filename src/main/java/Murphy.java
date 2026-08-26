@@ -3,6 +3,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -120,9 +122,14 @@ public class Murphy {
                     if (marker < 0 || input.substring(0, marker).trim().isEmpty()
                             || input.substring(marker + 5).trim().isEmpty()) {
                         throw new MurphyException("A deadline needs a description and a date/time, like: "
-                                + "deadline submit report /by Friday");
+                                + "deadline submit report /by 2019-10-15");
                     } else {
-                        tasks.add(new Deadline(input.substring(0, marker).trim(), input.substring(marker + 5).trim()));
+                        String dateText = input.substring(marker + 5).trim();
+                        try {
+                            tasks.add(new Deadline(input.substring(0, marker).trim(), LocalDate.parse(dateText)));
+                        } catch (DateTimeParseException exception) {
+                            throw new MurphyException("Please enter the deadline date as yyyy-MM-dd, like: 2019-10-15");
+                        }
                         saveTasks(tasks);
                         printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
@@ -250,7 +257,11 @@ public class Murphy {
         if (taskType.equals("T")) {
             task = new Todo(taskData.get(2));
         } else if (taskType.equals("D")) {
-            task = new Deadline(taskData.get(2), taskData.get(3));
+            try {
+                task = new Deadline(taskData.get(2), LocalDate.parse(taskData.get(3)));
+            } catch (DateTimeParseException exception) {
+                throw new IllegalArgumentException("Invalid deadline date", exception);
+            }
         } else {
             task = new Event(taskData.get(2), taskData.get(3), taskData.get(4));
         }
