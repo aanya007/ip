@@ -26,7 +26,7 @@ public class Storage {
     }
 
     /** Writes the current task list to disk. */
-    public void save(List<Task> tasks) throws MurphyException {
+    public void save(TaskList tasks) throws MurphyException {
         List<String> taskData = new ArrayList<>();
         for (Task task : tasks) {
             taskData.add(task.toDataString());
@@ -40,8 +40,8 @@ public class Storage {
     }
 
     /** Reads tasks from disk, skipping blank and corrupted lines. */
-    public List<Task> load() {
-        List<Task> tasks = new ArrayList<>();
+    public TaskList load() {
+        TaskList tasks = new TaskList();
         if (Files.notExists(filePath)) {
             return tasks;
         }

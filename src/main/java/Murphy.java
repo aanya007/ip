@@ -2,7 +2,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 
 /**
  * A friendly command-line chatbot that stores user-entered tasks in memory.
@@ -25,7 +24,7 @@ public class Murphy {
         Storage storage = new Storage(DATA_FILE_PATH, MAX_TASKS, ui);
         Parser parser = new Parser();
 
-        List<Task> tasks = storage.load();
+        TaskList tasks = storage.load();
 
         try (ui) {
             while (ui.hasNextCommand()) {
