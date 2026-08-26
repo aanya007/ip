@@ -17,6 +17,11 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    /** Returns whether this deadline falls on the supplied date. */
+    public boolean occursOn(LocalDate date) {
+        return by.equals(date);
+    }
+
     @Override
     public String toDataString() {
         return "D | " + (isDone() ? "1" : "0") + " | " + escapeDataField(description)

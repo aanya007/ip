@@ -1,3 +1,6 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 /** A task with a specified start and end date or time. */
 public class Event extends Task {
     /** The event start and end text, kept as entered by the user. */
@@ -9,6 +12,20 @@ public class Event extends Task {
         super(description);
         this.from = from;
         this.to = to;
+    }
+
+    /** Returns whether either ISO date endpoint falls on the supplied date. */
+    public boolean occursOn(LocalDate date) {
+        return isDate(from, date) || isDate(to, date);
+    }
+
+    /** Safely checks whether an event endpoint is an ISO date. */
+    private boolean isDate(String value, LocalDate date) {
+        try {
+            return LocalDate.parse(value).equals(date);
+        } catch (DateTimeParseException exception) {
+            return false;
+        }
     }
 
     @Override

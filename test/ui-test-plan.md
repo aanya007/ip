@@ -150,4 +150,48 @@ ____________________________________________________________
 ```text
 D | 0 | submit report | 2019-10-15
 ```
+
+## Test Case: Find deadlines and events on a date
+
+**Aim:** Verify that Murphy prints deadlines and ISO-date events occurring on a requested date, and rejects an invalid query date.
+
+**Data file before test:**
+
+```text
+D | 0 | submit report | 2019-10-15
+E | 0 | conference | 2019-10-15 | 2019-10-16
+```
+
+**Inputs:**
+
+```text
+on 2019-10-15
+on bad-date
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+M   M  U   U  RRRR   PPPP   H   H  Y   Y
+MM MM  U   U  R   R  P   P  H   H   Y Y
+M M M  U   U  RRRR   PPPP   HHHHH    Y
+M   M  U   U  R  R   P      H   H    Y
+M   M   UUU   R   R  P      H   H    Y
+Hi there! I'm Murphy, your command-line conversationalist.
+What can I do for you? (I promise not to judge your typing.)
+____________________________________________________________
+____________________________________________________________
+     Tasks on 2019-10-15:
+     1.[D][ ] submit report (by: Oct 15 2019)
+     2.[E][ ] conference (from: 2019-10-15 to: 2019-10-16)
+____________________________________________________________
+____________________________________________________________
+     OOPS! Please enter the date as yyyy-MM-dd, like: 2019-10-15
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon! Even command lines need a punchline.
+____________________________________________________________
+```
 ```

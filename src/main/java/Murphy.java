@@ -52,7 +52,26 @@ public class Murphy {
                         break;
                     }
 
-                    if (command.trim().equalsIgnoreCase("list")) {
+                    if (command.trim().toLowerCase().startsWith("on ")) {
+                    String dateText = command.trim().substring("on ".length()).trim();
+                    try {
+                        LocalDate date = LocalDate.parse(dateText);
+                        System.out.println("     Tasks on " + date + ":");
+                        int matchingTasks = 0;
+                        for (Task task : tasks) {
+                            if ((task instanceof Deadline && ((Deadline) task).occursOn(date))
+                                    || (task instanceof Event && ((Event) task).occursOn(date))) {
+                                matchingTasks++;
+                                System.out.println("     " + matchingTasks + "." + task);
+                            }
+                        }
+                        if (matchingTasks == 0) {
+                            System.out.println("     No deadlines or events found on that date.");
+                        }
+                    } catch (DateTimeParseException exception) {
+                        throw new MurphyException("Please enter the date as yyyy-MM-dd, like: 2019-10-15");
+                    }
+                } else if (command.trim().equalsIgnoreCase("list")) {
                     System.out.println("     Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
                         System.out.println("     " + (i + 1) + "." + tasks.get(i));
@@ -152,7 +171,7 @@ public class Murphy {
                     System.out.println("     I can't remember more than " + MAX_TASKS
                             + " tasks. My memory has reached its fixed-size finale.");
                 } else {
-                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, delete, mark, or unmark.");
+                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, on, delete, mark, or unmark.");
                 }
                 } catch (MurphyException exception) {
                     System.out.println("     OOPS! " + exception.getMessage());
