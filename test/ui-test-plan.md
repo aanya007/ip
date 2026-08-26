@@ -1,30 +1,103 @@
 # Murphy UI Test Plan
 
-This file is the source of truth for console-level UI tests. Add each test case before running the test session. The runner must process cases in the order listed and stop at the first failure.
+This file is the source of truth for console-level UI tests. Run the cases in order and stop at the first failure.
 
 ## Test environment
 
-- **Program command:** `<command to start Murphy>`
+- **Program command:** `javac -d _temp/classes src/main/java/*.java` followed by `java -cp _temp/classes Murphy`
 - **Working directory:** repository root
 - **Java version:** Java 25 (`sdk use java 25.0.3.fx-zulu` on macOS, if needed)
 - **Output comparison:** exact stdout/stderr, including prompts, whitespace, and line breaks
+- **Test isolation:** Start a fresh Murphy process and apply the stated data setup before each case.
 
-## Test case template
+## Test Case: Save without an existing data directory
 
-Copy this block for each test case and replace every placeholder:
+**Aim:** Verify that Murphy starts with an empty list when no save file exists, creates the missing directory, and saves UTF-8 text containing a pipe.
 
-## Test Case: <short name>
-
-**Aim:** <what behavior this verifies>
+**Data setup:** The `data` directory does not exist.
 
 **Inputs:**
 
 ```text
-<one command/input per line>
+todo compare A | B 😀
+bye
 ```
 
 **Expected output:**
 
 ```text
-<the exact complete output expected from the program>
+____________________________________________________________
+M   M  U   U  RRRR   PPPP   H   H  Y   Y
+MM MM  U   U  R   R  P   P  H   H   Y Y
+M M M  U   U  RRRR   PPPP   HHHHH    Y
+M   M  U   U  R  R   P      H   H    Y
+M   M   UUU   R   R  P      H   H    Y
+Hi there! I'm Murphy, your command-line conversationalist.
+What can I do for you? (I promise not to judge your typing.)
+____________________________________________________________
+____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] compare A | B 😀
+     Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon! Even command lines need a punchline.
+____________________________________________________________
+```
+
+**Expected data file:**
+
+```text
+T | 0 | compare A \| B 😀
+```
+
+## Test Case: Recover valid tasks from corrupted data
+
+**Aim:** Verify that Murphy ignores blank lines, reports malformed lines, and loads every valid task that remains.
+
+**Data file before test:**
+
+```text
+T | 1 | read book
+
+T | maybe | invalid status
+D | 0 | submit report | Friday
+E | 0 | missing end | 2pm |
+Z | 0 | unknown task
+E | 1 | café meeting | 2pm | 4pm
+T | 0 | compare A \| B
+```
+
+**Inputs:**
+
+```text
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+M   M  U   U  RRRR   PPPP   H   H  Y   Y
+MM MM  U   U  R   R  P   P  H   H   Y Y
+M M M  U   U  RRRR   PPPP   HHHHH    Y
+M   M  U   U  R  R   P      H   H    Y
+M   M   UUU   R   R  P      H   H    Y
+Hi there! I'm Murphy, your command-line conversationalist.
+What can I do for you? (I promise not to judge your typing.)
+____________________________________________________________
+     OOPS! I skipped corrupted save-file line 3.
+     OOPS! I skipped corrupted save-file line 5.
+     OOPS! I skipped corrupted save-file line 6.
+____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][X] read book
+     2.[D][ ] submit report (by: Friday)
+     3.[E][X] café meeting (from: 2pm to: 4pm)
+     4.[T][ ] compare A | B
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon! Even command lines need a punchline.
+____________________________________________________________
 ```

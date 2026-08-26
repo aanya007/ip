@@ -46,6 +46,29 @@ public class Task {
         return description;
     }
 
+    /**
+     * Returns whether this task has been completed.
+     *
+     * @return {@code true} if this task is completed
+     */
+    public boolean isDone() {
+        return isDone;
+    }
+
+    /**
+     * Returns this task in Murphy's save-file format.
+     *
+     * @return a pipe-separated representation of this task
+     */
+    public String toDataString() {
+        return "T | " + (isDone() ? "1" : "0") + " | " + escapeDataField(description);
+    }
+
+    /** Escapes characters that have a special meaning in Murphy's save-file format. */
+    protected static String escapeDataField(String value) {
+        return value.replace("\\", "\\\\").replace("|", "\\|");
+    }
+
     /** Returns the common task text, including its type and completion state. */
     @Override
     public String toString() {
