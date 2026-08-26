@@ -78,6 +78,23 @@ public class Murphy {
                     for (int i = 0; i < tasks.size(); i++) {
                         System.out.println("     " + (i + 1) + "." + tasks.get(i));
                     }
+                } else if (parsedCommand.command() == Parser.Command.FIND) {
+                    String keyword = parsedCommand.argument();
+                    if (keyword.isBlank()) {
+                        throw new MurphyException("Please provide a keyword to find, like: find book");
+                    }
+                    System.out.println("     Here are the matching tasks in your list:");
+                    int matchingTasks = 0;
+                    String lowerKeyword = keyword.toLowerCase();
+                    for (Task task : tasks) {
+                        if (task.getDescription().toLowerCase().contains(lowerKeyword)) {
+                            matchingTasks++;
+                            System.out.println("     " + matchingTasks + "." + task);
+                        }
+                    }
+                    if (matchingTasks == 0) {
+                        System.out.println("     No matching tasks found. Even Murphy's magnifying glass came up empty.");
+                    }
                 } else if (parsedCommand.command() == Parser.Command.DELETE) {
                     String taskNumber = parsedCommand.argument();
                     try {
@@ -173,7 +190,7 @@ public class Murphy {
                     System.out.println("     I can't remember more than " + MAX_TASKS
                             + " tasks. My memory has reached its fixed-size finale.");
                 } else {
-                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, on, delete, mark, or unmark.");
+                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, find, on, delete, mark, or unmark.");
                 }
                 } catch (MurphyException exception) {
                     System.out.println("     OOPS! " + exception.getMessage());

@@ -21,6 +21,7 @@ class ParserTest {
         assertParsed("mark 1", Parser.Command.MARK, "1", "mark 1");
         assertParsed("unmark 1", Parser.Command.UNMARK, "1", "unmark 1");
         assertParsed("list", Parser.Command.LIST, "", "list");
+        assertParsed("find book", Parser.Command.FIND, "book", "find book");
         assertParsed("bye", Parser.Command.BYE, "", "bye");
     }
 

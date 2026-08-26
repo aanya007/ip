@@ -162,6 +162,47 @@ D | 0 | submit report | 2019-10-15
 E | 0 | conference | 2019-10-15 | 2019-10-16
 ```
 
+## Test Case: Find tasks by keyword
+
+**Aim:** Verify that `find` displays tasks whose descriptions contain the keyword, without regard to letter case.
+
+**Data file before test:**
+
+```text
+T | 0 | read book
+D | 0 | return book | 2019-10-15
+T | 0 | buy milk
+```
+
+**Inputs:**
+
+```text
+find BOOK
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+M   M  U   U  RRRR   PPPP   H   H  Y   Y
+MM MM  U   U  R   R  P   P  H   H   Y Y
+M M M  U   U  RRRR   PPPP   HHHHH    Y
+M   M  U   U  R  R   P      H   H    Y
+M   M   UUU   R   R  P      H   H    Y
+Hi there! I'm Murphy, your command-line conversationalist.
+What can I do for you? (I promise not to judge your typing.)
+____________________________________________________________
+____________________________________________________________
+     Here are the matching tasks in your list:
+     1.[T][ ] read book
+     2.[D][ ] return book (by: Oct 15 2019)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon! Even command lines need a punchline.
+____________________________________________________________
+```
+
 **Inputs:**
 
 ```text
