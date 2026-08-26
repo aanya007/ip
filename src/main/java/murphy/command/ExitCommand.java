@@ -1,3 +1,9 @@
+package murphy.command;
+
+import murphy.storage.Storage;
+import murphy.task.TaskList;
+import murphy.ui.Ui;
+
 /** A command that ends Murphy's conversation. */
 public class ExitCommand extends Command {
     /** Displays the farewell message. */

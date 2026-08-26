@@ -1,3 +1,10 @@
+package murphy.command;
+
+import murphy.MurphyException;
+import murphy.storage.Storage;
+import murphy.task.TaskList;
+import murphy.ui.Ui;
+
 /** Represents one executable Murphy command. */
 public abstract class Command {
     /** Executes this command using Murphy's collaborators. */

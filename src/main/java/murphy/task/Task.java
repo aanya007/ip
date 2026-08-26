@@ -1,3 +1,5 @@
+package murphy.task;
+
 /**
  * Represents one task in Murphy's task list.
  */

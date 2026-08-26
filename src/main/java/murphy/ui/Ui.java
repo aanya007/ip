@@ -1,3 +1,5 @@
+package murphy.ui;
+
 import java.util.Scanner;
 
 /** Handles Murphy's console input and output. */
