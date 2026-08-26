@@ -4,7 +4,7 @@ package murphy.parser;
 public class Parser {
     /** The command types understood by Murphy. */
     public enum Command {
-        BYE, ON, LIST, DELETE, MARK, UNMARK, TODO, DEADLINE, EVENT, UNKNOWN
+        BYE, ON, LIST, DELETE, MARK, UNMARK, TODO, DEADLINE, EVENT, FIND, UNKNOWN
     }
 
     /** The result of parsing one input line. */
@@ -41,6 +41,9 @@ public class Parser {
         }
         if (lowerCase.startsWith("event ")) {
             return withArgument(Command.EVENT, trimmed, "event ".length());
+        }
+        if (lowerCase.startsWith("find ")) {
+            return withArgument(Command.FIND, trimmed, "find ".length());
         }
         return new ParsedCommand(Command.UNKNOWN, "", trimmed);
     }
