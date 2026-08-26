@@ -1,3 +1,5 @@
+package murphy.parser;
+
 /** Converts a raw user input line into a command and its argument. */
 public class Parser {
     /** The command types understood by Murphy. */

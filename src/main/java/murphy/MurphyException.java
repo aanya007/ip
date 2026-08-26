@@ -1,3 +1,5 @@
+package murphy;
+
 /**
  * Represents an error that Murphy can explain to the user.
  */
