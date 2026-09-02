@@ -1,7 +1,6 @@
 package murphy;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -24,7 +23,7 @@ public class MurphyApplication extends Application {
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
         root.getStyleClass().add("root-pane");
-        root.setTop(createHeader());
+        root.setTop(createTopBar());
         messages.getStyleClass().add("messages");
         addMessage("MURPHY", "hey. give me something to remember.", false);
         ScrollPane conversation = new ScrollPane(messages);
@@ -42,7 +41,9 @@ public class MurphyApplication extends Application {
         stage.show();
     }
 
+    private VBox createTopBar() { VBox top = new VBox(createHeader(), createCommandBar()); top.getStyleClass().add("top-bar"); return top; }
     private VBox createHeader() { Label title = new Label("MURPHY"); title.getStyleClass().add("title"); Label subtitle = new Label("PERSONAL TASK ARCHIVE"); subtitle.getStyleClass().add("subtitle"); Label status = new Label("● ONLINE"); status.getStyleClass().add("status"); HBox row = new HBox(18, title, subtitle); row.setAlignment(Pos.BASELINE_LEFT); VBox header = new VBox(4, row, status); header.getStyleClass().add("header"); return header; }
+    private HBox createCommandBar() { HBox commands = new HBox(8); commands.getStyleClass().add("command-bar"); for (String command : new String[] {"TODO", "DEADLINE", "EVENT", "LIST", "FIND", "ON", "MARK", "UNMARK", "DELETE", "BYE"}) { Label pill = new Label(command); pill.getStyleClass().add("command-pill"); commands.getChildren().add(pill); } return commands; }
     private VBox createSidebar() { taskCount.setText(taskSummary()); taskCount.getStyleClass().add("task-count"); Label heading = new Label("TASKS"); heading.getStyleClass().add("side-heading"); VBox side = new VBox(16, heading, taskCount); side.getStyleClass().add("sidebar"); return side; }
     private HBox createInputArea() { TextField input = new TextField(); input.setPromptText("type a command..."); Button send = new Button("SEND"); Runnable submit = () -> { String command = input.getText().trim(); if (!command.isEmpty()) { addMessage("YOU", command, true); String response = service.respond(command); addMessage("MURPHY", response, false); taskCount.setText(taskSummary()); input.clear(); } }; send.setOnAction(event -> submit.run()); input.setOnAction(event -> submit.run()); HBox area = new HBox(10, input, send); HBox.setHgrow(input, javafx.scene.layout.Priority.ALWAYS); area.getStyleClass().add("input-area"); return area; }
     private void addMessage(String sender, String text, boolean user) { Label name = new Label(sender); name.getStyleClass().add("message-sender"); Label body = new Label(text); body.setWrapText(true); body.getStyleClass().add(user ? "user-bubble" : "murphy-bubble"); VBox bubble = new VBox(4, name, body); bubble.setMaxWidth(620); bubble.setAlignment(user ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT); messages.getChildren().add(bubble); }
