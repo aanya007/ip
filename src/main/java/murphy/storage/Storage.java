@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import murphy.MurphyException;
 import murphy.task.Deadline;
@@ -26,13 +27,18 @@ public class Storage {
     private final int maxTasks;
 
     /** UI used to report recoverable file problems. */
-    private final Ui ui;
+    private final Consumer<String> messageConsumer;
 
     /** Creates storage for a task file. */
     public Storage(Path filePath, int maxTasks, Ui ui) {
+        this(filePath, maxTasks, ui::showMessage);
+    }
+
+    /** Creates storage with a callback for recoverable file problems. */
+    public Storage(Path filePath, int maxTasks, Consumer<String> messageConsumer) {
         this.filePath = filePath;
         this.maxTasks = maxTasks;
-        this.ui = ui;
+        this.messageConsumer = messageConsumer;
     }
 
     /** Writes the current task list to disk. */
@@ -63,18 +69,18 @@ public class Storage {
                     continue;
                 }
                 if (tasks.size() >= maxTasks) {
-                    ui.showMessage("     OOPS! The save file has more than " + maxTasks
+                    messageConsumer.accept("     OOPS! The save file has more than " + maxTasks
                             + " tasks, so I loaded only the first " + maxTasks + ".");
                     break;
                 }
                 try {
                     tasks.add(parseTask(line));
                 } catch (IllegalArgumentException exception) {
-                    ui.showMessage("     OOPS! I skipped corrupted save-file line " + (i + 1) + ".");
+                    messageConsumer.accept("     OOPS! I skipped corrupted save-file line " + (i + 1) + ".");
                 }
             }
         } catch (IOException exception) {
-            ui.showMessage("     OOPS! I couldn't read the save file, so I'm starting with an empty list.");
+            messageConsumer.accept("     OOPS! I couldn't read the save file, so I'm starting with an empty list.");
             tasks.clear();
         }
         return tasks;
