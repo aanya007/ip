@@ -1,18 +1,18 @@
-.root-pane { -fx-background-color: #FFFFFF; -fx-font-family: "Fredoka", "Arial Rounded MT Bold", "Arial"; }
+.root-pane { -fx-background-color: #F3F8F3; -fx-font-family: "Avenir Next", "Trebuchet MS", sans-serif; }
 .header { -fx-padding: 20px 28px 14px 28px; -fx-background-color: #000000; }
 .title { -fx-text-fill: #39FF14; -fx-font-size: 34px; -fx-font-weight: bold; }
 .subtitle, .message-sender, .side-heading { -fx-text-fill: #FFFFFF; -fx-font-size: 12px; -fx-font-weight: bold; }
 .status { -fx-text-fill: #39FF14; -fx-font-size: 12px; }
-.command-bar { -fx-padding: 12px 28px; -fx-background-color: #FFFFFF; -fx-border-color: #000000; -fx-border-width: 0 0 2px 0; }
-.command-pill { -fx-padding: 7px 11px; -fx-background-color: #E8FFE5; -fx-background-radius: 18px; -fx-border-color: #39FF14; -fx-border-radius: 18px; -fx-text-fill: #000000; -fx-font-size: 11px; -fx-font-weight: bold; }
-.conversation, .conversation .viewport { -fx-background-color: #FFFFFF; -fx-border-color: transparent; }
-.messages { -fx-padding: 28px; -fx-background-color: #FFFFFF; }
-.murphy-bubble, .user-bubble { -fx-padding: 14px 18px; -fx-background-radius: 20px; -fx-border-width: 2px; -fx-font-family: "Nunito", "Arial", sans-serif; -fx-font-size: 14px; }
+.command-bar { -fx-padding: 12px 28px; -fx-background-color: #FFFFFF; -fx-border-color: #D7E5D7; -fx-border-width: 0 0 1px 0; }
+.command-pill { -fx-padding: 7px 11px; -fx-background-color: #E3F4E3; -fx-background-radius: 18px; -fx-border-color: #B8DDB8; -fx-border-radius: 18px; -fx-text-fill: #172117; -fx-font-size: 11px; -fx-font-weight: bold; }
+.conversation, .conversation .viewport { -fx-background-color: #F3F8F3; -fx-border-color: transparent; }
+.messages { -fx-padding: 28px; -fx-background-color: #F3F8F3; }
+.murphy-bubble, .user-bubble { -fx-padding: 14px 18px; -fx-background-radius: 20px; -fx-border-width: 1px; -fx-font-family: "Avenir Next", "Trebuchet MS", sans-serif; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(24, 55, 24, 0.16), 9, 0.18, 0, 3); }
 .murphy-bubble { -fx-background-color: #FFFFFF; -fx-text-fill: #000000; -fx-border-color: #39FF14; }
-.user-bubble { -fx-background-color: #39FF14; -fx-text-fill: #000000; -fx-border-color: #000000; }
-.sidebar { -fx-padding: 28px 22px; -fx-min-width: 170px; -fx-background-color: #000000; }
-.task-count { -fx-text-fill: #39FF14; -fx-font-family: "Nunito", "Arial", sans-serif; -fx-font-size: 18px; -fx-line-spacing: 8px; }
-.input-area { -fx-padding: 18px 28px 24px 28px; -fx-background-color: #FFFFFF; -fx-border-color: #000000; -fx-border-width: 2px 0 0 0; }
+.user-bubble { -fx-background-color: #B9E8B3; -fx-text-fill: #172117; -fx-border-color: #A5D49F; }
+.sidebar { -fx-padding: 28px 22px; -fx-min-width: 170px; -fx-background-color: #FFFFFF; -fx-border-color: #D7E5D7; -fx-border-width: 0 0 0 1px; }
+.task-count { -fx-text-fill: #39FF14; -fx-font-family: "Avenir Next", "Trebuchet MS", sans-serif; -fx-font-size: 18px; -fx-line-spacing: 8px; }
+.input-area { -fx-padding: 18px 28px 24px 28px; -fx-background-color: #FFFFFF; -fx-border-color: #D7E5D7; -fx-border-width: 1px 0 0 0; }
 .text-field { -fx-background-color: #FFFFFF; -fx-background-radius: 22px; -fx-border-color: #000000; -fx-border-radius: 22px; -fx-border-width: 2px; -fx-text-fill: #000000; -fx-prompt-text-fill: #777777; -fx-font-family: "Nunito", "Arial", sans-serif; -fx-font-size: 14px; -fx-padding: 12px 18px; }
-.button { -fx-background-color: #39FF14; -fx-background-radius: 22px; -fx-border-color: #000000; -fx-border-radius: 22px; -fx-border-width: 2px; -fx-text-fill: #000000; -fx-font-weight: bold; -fx-padding: 12px 22px; -fx-cursor: hand; }
-.button:hover, .command-pill:hover { -fx-background-color: #000000; -fx-text-fill: #39FF14; }
+.button { -fx-background-color: #39FF14; -fx-background-radius: 22px; -fx-border-color: #A5D49F; -fx-border-radius: 22px; -fx-border-width: 1px; -fx-text-fill: #102010; -fx-font-weight: bold; -fx-padding: 12px 22px; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(24, 55, 24, 0.14), 7, 0.18, 0, 2); }
+.button:hover, .command-pill:hover { -fx-background-color: #D9F5D5; -fx-text-fill: #102010; }
