@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /** JavaFX presentation for Murphy's task chatbot. */
@@ -22,6 +23,8 @@ public class MurphyApplication extends Application {
     /** Builds and displays Murphy's main window. */
     @Override
     public void start(Stage stage) {
+        Font.loadFont(getClass().getResourceAsStream("/fonts/Fredoka.ttf"), 16);
+        Font.loadFont(getClass().getResourceAsStream("/fonts/Nunito.ttf"), 16);
         BorderPane root = new BorderPane();
         root.getStyleClass().add("root-pane");
         root.setTop(createTopBar());
