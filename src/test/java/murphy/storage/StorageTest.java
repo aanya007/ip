@@ -19,7 +19,7 @@ import murphy.ui.Ui;
 /** Tests Murphy's persistence of valid and malformed task data. */
 class StorageTest {
     @TempDir
-    Path temporaryDirectory;
+    private Path temporaryDirectory;
 
     /** Verifies round-trip persistence, including escaping and completion state. */
     @Test

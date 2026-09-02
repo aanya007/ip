@@ -1,12 +1,13 @@
 package murphy;
 
+import java.io.IOException;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import java.io.IOException;
 
 /** A reusable chat bubble containing an avatar and a message. */
 public class DialogBox extends HBox {

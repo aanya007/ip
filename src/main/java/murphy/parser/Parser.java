@@ -7,7 +7,6 @@ public class Parser {
         BYE, ON, LIST, DELETE, MARK, UNMARK, TODO, DEADLINE, EVENT, FIND, UNKNOWN
     }
 
-    /** The result of parsing one input line. */
     /** Holds the command recognized from one input line and its text arguments. */
     public record ParsedCommand(Command command, String argument, String originalText) { }
 

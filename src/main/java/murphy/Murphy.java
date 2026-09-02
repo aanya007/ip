@@ -93,7 +93,8 @@ public class Murphy {
                         }
                     }
                     if (matchingTasks == 0) {
-                        System.out.println("     No matching tasks found. Even Murphy's magnifying glass came up empty.");
+                        System.out.println("     No matching tasks found. Even Murphy's magnifying glass "
+                                + "came up empty.");
                     }
                 } else if (parsedCommand.command() == Parser.Command.DELETE) {
                     String taskNumber = parsedCommand.argument();
@@ -182,7 +183,8 @@ public class Murphy {
                                 + "event meeting /from 2pm /to 4pm");
                     } else {
                         tasks.add(new Event(input.substring(0, fromMarker).trim(),
-                                input.substring(fromMarker + 7, toMarker).trim(), input.substring(toMarker + 5).trim()));
+                                input.substring(fromMarker + 7, toMarker).trim(),
+                                input.substring(toMarker + 5).trim()));
                         storage.save(tasks);
                         printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
@@ -190,7 +192,8 @@ public class Murphy {
                     System.out.println("     I can't remember more than " + MAX_TASKS
                             + " tasks. My memory has reached its fixed-size finale.");
                 } else {
-                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, find, on, delete, mark, or unmark.");
+                    throw new MurphyException("I don't recognise that command. Try todo, deadline, event, list, "
+                            + "find, on, delete, mark, or unmark.");
                 }
                 } catch (MurphyException exception) {
                     System.out.println("     OOPS! " + exception.getMessage());
