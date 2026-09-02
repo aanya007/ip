@@ -22,7 +22,12 @@ public class MurphyService {
 
     /** Creates a service and loads Murphy's saved tasks. */
     public MurphyService() {
-        storage = new Storage(DATA_FILE_PATH, MAX_TASKS, message -> { });
+        this(DATA_FILE_PATH);
+    }
+
+    /** Creates a service using the supplied task data path. */
+    public MurphyService(Path dataFilePath) {
+        storage = new Storage(dataFilePath, MAX_TASKS, message -> { });
         tasks = storage.load();
     }
 
