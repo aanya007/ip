@@ -1,5 +1,7 @@
 package murphy.task;
 
+import java.util.Locale;
+
 /**
  * Represents one task in Murphy's task list.
  */
@@ -58,6 +60,18 @@ public class Task {
     }
 
     /**
+     * Returns whether this task has the same user-provided details as another task.
+     * Completion status is intentionally not part of task identity.
+     *
+     * @param other the task to compare with
+     * @return {@code true} when both tasks are todos with equivalent descriptions
+     */
+    public boolean hasSameDetailsAs(Task other) {
+        return other != null && getClass() == other.getClass()
+                && normalize(description).equals(normalize(other.description));
+    }
+
+    /**
      * Returns this task in Murphy's save-file format.
      *
      * @return a pipe-separated representation of this task
@@ -69,6 +83,11 @@ public class Task {
     /** Escapes characters that have a special meaning in Murphy's save-file format. */
     protected static String escapeDataField(String value) {
         return value.replace("\\", "\\\\").replace("|", "\\|");
+    }
+
+    /** Normalizes user-entered text for case-insensitive duplicate detection. */
+    protected static String normalize(String value) {
+        return value.trim().toLowerCase(Locale.ROOT);
     }
 
     /** Returns the common task text, including its type and completion state. */

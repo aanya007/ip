@@ -24,6 +24,14 @@ public class Deadline extends Task {
         return by.equals(date);
     }
 
+    /** Returns whether another deadline has the same description and date. */
+    @Override
+    public boolean hasSameDetailsAs(Task other) {
+        return other instanceof Deadline deadline
+                && normalize(description).equals(normalize(deadline.description))
+                && by.equals(deadline.by);
+    }
+
     /** Returns this deadline in Murphy's save-file format. */
     @Override
     public String toDataString() {

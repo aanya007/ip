@@ -54,6 +54,16 @@ public class TaskList implements Iterable<Task> {
         return new ArrayList<>(tasks);
     }
 
+    /** Returns the first existing task with the same details as the candidate, if any. */
+    public Task findDuplicate(Task candidate) {
+        for (Task task : tasks) {
+            if (task.hasSameDetailsAs(candidate)) {
+                return task;
+            }
+        }
+        return null;
+    }
+
     /** Allows Murphy to display or search every task in order. */
     @Override
     public java.util.Iterator<Task> iterator() {
