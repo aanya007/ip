@@ -58,18 +58,7 @@ public class Murphy {
                         String dateText = parsedCommand.argument();
                         try {
                             LocalDate date = LocalDate.parse(dateText);
-                            System.out.println("     Tasks on " + date + ":");
-                            int matchingTasks = 0;
-                            for (Task task : tasks) {
-                                if ((task instanceof Deadline && ((Deadline) task).occursOn(date))
-                                        || (task instanceof Event && ((Event) task).occursOn(date))) {
-                                    matchingTasks++;
-                                    System.out.println("     " + matchingTasks + "." + task);
-                                }
-                            }
-                            if (matchingTasks == 0) {
-                                System.out.println("     No deadlines or events found on that date.");
-                            }
+                            printTasksOnDate(tasks, date);
                         } catch (DateTimeParseException exception) {
                             throw new MurphyException("Please enter the date as yyyy-MM-dd, like: 2019-10-15");
                         }
@@ -205,5 +194,21 @@ public class Murphy {
         System.out.println("     Got it. I've added this task:");
         System.out.println("       " + task);
         System.out.println("     Now you have " + taskCount + " tasks in the list.");
+    }
+
+    /** Prints all deadlines and events that occur on the supplied date. */
+    private static void printTasksOnDate(TaskList tasks, LocalDate date) {
+        System.out.println("     Tasks on " + date + ":");
+        int matchingTasks = 0;
+        for (Task task : tasks) {
+            if ((task instanceof Deadline && ((Deadline) task).occursOn(date))
+                    || (task instanceof Event && ((Event) task).occursOn(date))) {
+                matchingTasks++;
+                System.out.println("     " + matchingTasks + "." + task);
+            }
+        }
+        if (matchingTasks == 0) {
+            System.out.println("     No deadlines or events found on that date.");
+        }
     }
 }
