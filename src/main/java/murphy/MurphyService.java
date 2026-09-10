@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.stream.IntStream;
 import murphy.parser.Parser;
 import murphy.storage.Storage;
 import murphy.task.Deadline;
@@ -69,11 +71,15 @@ public class MurphyService {
     private String findTasks(String keyword) throws MurphyException {
         if (keyword.isBlank()) throw new MurphyException("Please provide a keyword to find, like: find book");
         StringBuilder result = new StringBuilder("Here are the matching tasks in your list:");
-        int count = 0;
-        for (Task task : tasks) if (task.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
-            result.append("\n").append(++count).append(".").append(task);
-        }
-        return count == 0 ? result + "\nNo matching tasks found. Even Murphy's magnifying glass came up empty." : result.toString();
+        String lowerKeyword = keyword.toLowerCase();
+        List<Task> matchingTasks = tasks.asList().stream()
+                .filter(task -> task.getDescription().toLowerCase().contains(lowerKeyword))
+                .toList();
+        IntStream.range(0, matchingTasks.size()).forEach(index -> result.append("\n")
+                .append(index + 1).append(".").append(matchingTasks.get(index)));
+        return matchingTasks.isEmpty()
+                ? result + "\nNo matching tasks found. Even Murphy's magnifying glass came up empty."
+                : result.toString();
     }
 
     private String tasksOn(String dateText) throws MurphyException {
