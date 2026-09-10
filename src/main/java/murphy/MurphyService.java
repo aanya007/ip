@@ -100,5 +100,17 @@ public class MurphyService {
     private String addTodo(Parser.ParsedCommand parsed) throws MurphyException { String description = parsed.argument(); if (description.isBlank()) throw new MurphyException("A todo needs a description. Try: todo buy groceries"); return add(new Todo(description)); }
     private String addDeadline(String input) throws MurphyException { int marker = input.indexOf(" /by "); if (marker < 0) throw new MurphyException("A deadline needs a description and a date/time, like: deadline submit report /by 2019-10-15"); try { return add(new Deadline(input.substring(0, marker).trim(), LocalDate.parse(input.substring(marker + 5).trim()))); } catch (DateTimeParseException exception) { throw new MurphyException("Please enter the deadline date as yyyy-MM-dd, like: 2019-10-15"); } }
     private String addEvent(String input) throws MurphyException { int from = input.indexOf(" /from "); int to = input.indexOf(" /to ", from + 7); if (from < 0 || to < 0) throw new MurphyException("An event needs a description, start, and end time, like: event meeting /from 2pm /to 4pm"); return add(new Event(input.substring(0, from).trim(), input.substring(from + 7, to).trim(), input.substring(to + 5).trim())); }
-    private String add(Task task) throws MurphyException { if (tasks.size() >= MAX_TASKS) throw new MurphyException("I can't remember more than " + MAX_TASKS + " tasks."); tasks.add(task); storage.save(tasks); return "Got it. I've added this task:\n" + task + "\nNow you have " + tasks.size() + " tasks in the list."; }
+    private String add(Task task) throws MurphyException {
+        Task duplicate = tasks.findDuplicate(task);
+        if (duplicate != null) {
+            return "OOPS! This task is already in your list:\n" + duplicate
+                    + "\nI kept the existing task and did not add a duplicate.";
+        }
+        if (tasks.size() >= MAX_TASKS) {
+            throw new MurphyException("I can't remember more than " + MAX_TASKS + " tasks.");
+        }
+        tasks.add(task);
+        storage.save(tasks);
+        return "Got it. I've added this task:\n" + task + "\nNow you have " + tasks.size() + " tasks in the list.";
+    }
 }

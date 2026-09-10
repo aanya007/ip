@@ -37,4 +37,29 @@ public class MurphyServiceTest {
         assertTrue(service.respond("deadline report /by not-a-date").startsWith("OOPS!"));
         assertEquals(0, service.getTasks().size());
     }
+
+    @Test
+    public void respond_rejectsDuplicateTodoIgnoringCaseAndStatus() throws Exception {
+        MurphyService service = new MurphyService(Files.createTempDirectory("murphy-test").resolve("tasks.txt"));
+
+        service.respond("todo Buy milk");
+        service.respond("mark 1");
+
+        String response = service.respond("todo   buy milk");
+
+        assertEquals("OOPS! This task is already in your list:\n[T][X] Buy milk"
+                + "\nI kept the existing task and did not add a duplicate.", response);
+        assertEquals(1, service.getTasks().size());
+    }
+
+    @Test
+    public void respond_allowsTasksWithDifferentTypeOrDetails() throws Exception {
+        MurphyService service = new MurphyService(Files.createTempDirectory("murphy-test").resolve("tasks.txt"));
+
+        service.respond("todo submit report");
+        service.respond("deadline submit report /by 2026-09-10");
+        service.respond("deadline submit report /by 2026-09-11");
+
+        assertEquals(3, service.getTasks().size());
+    }
 }

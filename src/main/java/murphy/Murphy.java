@@ -133,17 +133,26 @@ public class Murphy {
                     } catch (NumberFormatException exception) {
                         System.out.println("     Please tell me which task number to unmark, like: unmark 2");
                     }
-                } else if (parsedCommand.command() == Parser.Command.TODO && tasks.size() < MAX_TASKS) {
+                } else if (parsedCommand.command() == Parser.Command.TODO) {
                     String trimmedCommand = parsedCommand.originalText();
                     String description = trimmedCommand.length() > "todo".length()
                             ? trimmedCommand.substring("todo".length()).trim() : "";
                     if (description.isEmpty()) {
                         throw new MurphyException("A todo needs a description. Try: todo buy groceries");
                     }
-                    tasks.add(new Todo(description));
-                    storage.save(tasks);
-                    printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
-                } else if (parsedCommand.command() == Parser.Command.DEADLINE && tasks.size() < MAX_TASKS) {
+                    Task newTask = new Todo(description);
+                    Task duplicate = tasks.findDuplicate(newTask);
+                    if (duplicate != null) {
+                        printDuplicateTask(duplicate);
+                    } else if (tasks.size() >= MAX_TASKS) {
+                        throw new MurphyException("I can't remember more than " + MAX_TASKS
+                                + " tasks. My memory has reached its fixed-size finale.");
+                    } else {
+                        tasks.add(newTask);
+                        storage.save(tasks);
+                        printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
+                    }
+                } else if (parsedCommand.command() == Parser.Command.DEADLINE) {
                     String input = parsedCommand.argument();
                     int marker = input.indexOf(" /by ");
                     if (marker < 0 || input.substring(0, marker).trim().isEmpty()
@@ -153,14 +162,23 @@ public class Murphy {
                     } else {
                         String dateText = input.substring(marker + 5).trim();
                         try {
-                            tasks.add(new Deadline(input.substring(0, marker).trim(), LocalDate.parse(dateText)));
+                            Task newTask = new Deadline(input.substring(0, marker).trim(), LocalDate.parse(dateText));
+                            Task duplicate = tasks.findDuplicate(newTask);
+                            if (duplicate != null) {
+                                printDuplicateTask(duplicate);
+                            } else if (tasks.size() >= MAX_TASKS) {
+                                throw new MurphyException("I can't remember more than " + MAX_TASKS
+                                        + " tasks. My memory has reached its fixed-size finale.");
+                            } else {
+                                tasks.add(newTask);
+                                storage.save(tasks);
+                                printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
+                            }
                         } catch (DateTimeParseException exception) {
                             throw new MurphyException("Please enter the deadline date as yyyy-MM-dd, like: 2019-10-15");
                         }
-                        storage.save(tasks);
-                        printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
                     }
-                } else if (parsedCommand.command() == Parser.Command.EVENT && tasks.size() < MAX_TASKS) {
+                } else if (parsedCommand.command() == Parser.Command.EVENT) {
                     String input = parsedCommand.argument();
                     int fromMarker = input.indexOf(" /from ");
                     int toMarker = input.indexOf(" /to ", fromMarker + 7);
@@ -170,10 +188,19 @@ public class Murphy {
                         throw new MurphyException("An event needs a description, start, and end time, like: "
                                 + "event meeting /from 2pm /to 4pm");
                     } else {
-                        tasks.add(new Event(input.substring(0, fromMarker).trim(),
-                                input.substring(fromMarker + 7, toMarker).trim(), input.substring(toMarker + 5).trim()));
-                        storage.save(tasks);
-                        printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
+                        Task newTask = new Event(input.substring(0, fromMarker).trim(),
+                                input.substring(fromMarker + 7, toMarker).trim(), input.substring(toMarker + 5).trim());
+                        Task duplicate = tasks.findDuplicate(newTask);
+                        if (duplicate != null) {
+                            printDuplicateTask(duplicate);
+                        } else if (tasks.size() >= MAX_TASKS) {
+                            throw new MurphyException("I can't remember more than " + MAX_TASKS
+                                    + " tasks. My memory has reached its fixed-size finale.");
+                        } else {
+                            tasks.add(newTask);
+                            storage.save(tasks);
+                            printAddedTask(tasks.get(tasks.size() - 1), tasks.size());
+                        }
                     }
                 } else if (tasks.size() >= MAX_TASKS) {
                     System.out.println("     I can't remember more than " + MAX_TASKS
@@ -194,6 +221,13 @@ public class Murphy {
         System.out.println("     Got it. I've added this task:");
         System.out.println("       " + task);
         System.out.println("     Now you have " + taskCount + " tasks in the list.");
+    }
+
+    /** Prints the response shown when an equivalent task already exists. */
+    private static void printDuplicateTask(Task task) {
+        System.out.println("     OOPS! This task is already in your list:");
+        System.out.println("       " + task);
+        System.out.println("     I kept the existing task and did not add a duplicate.");
     }
 
     /** Prints all deadlines and events that occur on the supplied date. */

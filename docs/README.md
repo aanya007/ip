@@ -1,10 +1,8 @@
 # Murphy User Guide
 
-// Update the title above to match the actual product name
-
-// Product screenshot goes here
-
-// Product intro goes here
+Murphy rejects newly added tasks that duplicate an existing task. Duplicate
+detection ignores leading and trailing whitespace, letter case, and completion
+status. Existing duplicate records in a save file are preserved.
 
 ## Adding deadlines
 
@@ -20,11 +18,24 @@ Example: `keyword (optional arguments)`
 expected output
 ```
 
-## Feature ABC
+## Handling duplicate tasks
 
-// Feature details
+Duplicate detection applies to `todo`, `deadline`, and `event` commands. A
+duplicate must have the same task type and the same task details.
 
+```text
+todo buy milk
+todo Buy milk
+```
 
-## Feature XYZ
+The second command is rejected:
 
-// Feature details
+```text
+OOPS! This task is already in your list:
+[T][ ] buy milk
+I kept the existing task and did not add a duplicate.
+```
+
+Tasks with different types, deadline dates, or event start/end values are not
+duplicates. Use `list` and `delete <task number>` to review and remove any
+duplicate records that already existed before this feature.

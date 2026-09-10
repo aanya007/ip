@@ -235,4 +235,50 @@ ____________________________________________________________
 Bye. Hope to see you again soon! Even command lines need a punchline.
 ____________________________________________________________
 ```
+
+## Test Case: Reject a duplicate task
+
+**Aim:** Verify that Murphy rejects a newly added task with the same type and description, ignoring case and surrounding whitespace, without changing the task count or save file.
+
+**Data setup:** The `data` directory does not exist.
+
+**Inputs:**
+
+```text
+todo Buy milk
+todo   buy MILK
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+M   M  U   U  RRRR   PPPP   H   H  Y   Y
+MM MM  U   U  R   R  P   P  H   H   Y Y
+M M M  U   U  RRRR   PPPP   HHHHH    Y
+M   M  U   U  R  R   P      H   H    Y
+M   M   UUU   R   R  P      H   H    Y
+Hi there! I'm Murphy, your command-line conversationalist.
+What can I do for you? (I promise not to judge your typing.)
+____________________________________________________________
+____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] Buy milk
+     Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+     OOPS! This task is already in your list:
+       [T][ ] Buy milk
+     I kept the existing task and did not add a duplicate.
+____________________________________________________________
+____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] Buy milk
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon! Even command lines need a punchline.
+____________________________________________________________
+```
 ```

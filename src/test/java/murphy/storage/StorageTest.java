@@ -60,4 +60,16 @@ class StorageTest {
         assertEquals("valid task", loaded.get(0).getDescription());
         assertEquals("valid event", loaded.get(1).getDescription());
     }
+
+    /** Verifies that existing duplicate records remain backward compatible. */
+    @Test
+    void load_existingDuplicates_preservesEveryRecord() throws Exception {
+        Path file = temporaryDirectory.resolve("duplicates.txt");
+        Files.writeString(file, "T | 0 | buy milk\nT | 1 | buy milk\n");
+
+        TaskList loaded = new Storage(file, 10, new Ui()).load();
+
+        assertEquals(2, loaded.size());
+        assertTrue(loaded.get(1).isDone());
+    }
 }

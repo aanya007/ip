@@ -21,6 +21,15 @@ public class Event extends Task {
         return isDate(from, date) || isDate(to, date);
     }
 
+    /** Returns whether another event has the same description, start, and end values. */
+    @Override
+    public boolean hasSameDetailsAs(Task other) {
+        return other instanceof Event event
+                && normalize(description).equals(normalize(event.description))
+                && normalize(from).equals(normalize(event.from))
+                && normalize(to).equals(normalize(event.to));
+    }
+
     /** Safely checks whether an event endpoint is an ISO date. */
     private boolean isDate(String value, LocalDate date) {
         try {
